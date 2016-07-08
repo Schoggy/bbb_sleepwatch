@@ -1,0 +1,16 @@
+@empy.include("bericht.cfg")
+
+.. raw:: latex
+   :file: ../titelseite.tex
+
+.. raw:: html
+   :file: ../titelseite.html
+
+@# ==============================================================
+@# @{
+@# print titel.strip()
+@# }@
+@# ==============================================================
+
+.. contents::
+.. sectnum::

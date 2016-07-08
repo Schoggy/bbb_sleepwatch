@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
+<title></title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+body { 
+    margin-left:  100px; 
+    margin-right: 100px;
+}
+
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img src="img/hsa-logo.jpg" width="200" 
+     alt="Logo der Hochschule Augsburg" align=right vspace="0">
+
+<p>
+
+<h2>Praktikum Embedded Linux
+</h2>
+
+Embedded Linux<br>
+Hochschule Augsburg <br>
+Fakultät für Informatik (Prof. Dr. Hubert Högl) <br>
+Studiengang Technische Informatik, 4. Semester <br>
+
+Sommersemester 2016
+ <br>
+<!-- print date -->
+Datum: 2016-07-05 18:04
+
+<p>
+
+Philip Manke, &lt;Philip.Manke@hs-augsburg.de&gt;,  #945072 <br>
+
+<hr>
+<img src=img/cc-logo.jpg width="150" alt="cc-logo"><br>
+Dieser Text steht unter der Creative Commons Lizenz 
+<a href="http://creativecommons.org/licenses/by-nc/3.0/de/">"Namensnennung/Keine kommerizelle Nutzung"<a/>
+
+
+<center>
+          <h2>
+Schlafüberwachung mit dem Beaglebone Black
+</h2>
+</center>
+
+
+<div class="contents topic" id="inhalt">
+<p class="topic-title first">Inhalt</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#einleitung" id="id14">1&nbsp;&nbsp;&nbsp;Einleitung</a></li>
+<li><a class="reference internal" href="#vorbereiten-des-rechners" id="id15">2&nbsp;&nbsp;&nbsp;Vorbereiten des Rechners</a></li>
+<li><a class="reference internal" href="#so-gehen-sie-vor" id="id16">3&nbsp;&nbsp;&nbsp;So gehen Sie vor</a></li>
+<li><a class="reference internal" href="#so-funktioniert-es" id="id17">4&nbsp;&nbsp;&nbsp;So funktioniert es</a></li>
+<li><a class="reference internal" href="#die-lizenz" id="id18">5&nbsp;&nbsp;&nbsp;Die Lizenz</a></li>
+<li><a class="reference internal" href="#ein-paar-fomatierungshinweise" id="id19">6&nbsp;&nbsp;&nbsp;Ein paar Fomatierungshinweise</a></li>
+<li><a class="reference internal" href="#mogliche-verbesserungen" id="id20">7&nbsp;&nbsp;&nbsp;Mögliche Verbesserungen</a></li>
+<li><a class="reference internal" href="#literatur" id="id21">8&nbsp;&nbsp;&nbsp;Literatur</a></li>
+</ul>
+</div>
+<div class="section" id="einleitung">
+<h1><a class="toc-backref" href="#id14">1&nbsp;&nbsp;&nbsp;Einleitung</a></h1>
+<p>Dieser Bericht bezieht sich auf den Versuch V2 &quot;Das Arduino Projekt&quot;.</p>
+<p>Es sind keine expliziten Versuchsanweisungen gegeben, außer di</p>
+<p>Sie müssen in Ihrem Studium öfter Texte wie zum Beispiel Praktikums- und
+Versuchsberichte abgeben. Als langjähriger &quot;Empfänger&quot; von diesen Texten
+habe ich mir mal überlegt, wie ein &quot;idealer&quot; Bericht sowohl aus Ihrer, als
+auch aus meiner Sicht aussehen könnte:</p>
+<p>Studentische Sicht:</p>
+<blockquote>
+<ul class="simple">
+<li>Einfach zu schreiben in einem gewöhnlichen (Programmier-)Editor.</li>
+<li>Die Titelseite wird automatisch erstellt.</li>
+<li>Ein einheitliches Format kann in HTML und PDF umgewandelt werden.</li>
+<li>Funktioniert mit Linux und Windows</li>
+</ul>
+</blockquote>
+<p>Aus meiner Sicht:</p>
+<blockquote>
+<ul class="simple">
+<li>Einheitliches Aussehen</li>
+<li>Gut in Web-Dokument umwandelbar</li>
+<li>Format einfach automatisiert weiterverarbeitbar, z.B. in gedruckte
+Berichtsammlungen</li>
+<li>Kleine Dateien</li>
+</ul>
+</blockquote>
+<p>Dieses einheitliche Format gibt es bereits, es nennt sich &quot;reStructuredText&quot;
+(reST).  Es entstand vor einigen Jahren in der Welt der Programmiersprache
+Python. Die gesamte Python Dokumentation wird mittlerweile in diesem Format
+geschrieben und mit <a class="citation-reference" href="#sphinx" id="id1">[SPHINX]</a> automatisch in die Darstellungen Text, HTML und
+PDF umgewandelt, siehe <a class="citation-reference" href="#pydoc" id="id2">[PYDOC]</a>. Die reST Homepage ist <a class="citation-reference" href="#rest" id="id3">[REST]</a>.</p>
+</div>
+<div class="section" id="vorbereiten-des-rechners">
+<h1><a class="toc-backref" href="#id15">2&nbsp;&nbsp;&nbsp;Vorbereiten des Rechners</a></h1>
+<blockquote>
+<dl class="docutils">
+<dt>Windows</dt>
+<dd>Sie brauchen den Python Interpreter <a class="citation-reference" href="#python" id="id4">[PYTHON]</a> und das Docutils Paket
+<a class="citation-reference" href="#docutils" id="id5">[DOCUTILS]</a>.  Das reicht für die Ausgabe von HTML Dateien. Falls Sie
+ausserdem Dokumente im PDF Format erzeugen wollen, müssen Sie <em>TeX</em>
+installiere, ich empfehle <a class="citation-reference" href="#miktex" id="id6">[MIKTEX]</a> oder <a class="citation-reference" href="#texlive" id="id7">[TEXLIVE]</a>.</dd>
+<dt>Linux</dt>
+<dd>Sie brauchen den Python Interpreter <a class="citation-reference" href="#python" id="id8">[PYTHON]</a> und das Docutils Paket,
+siehe <a class="citation-reference" href="#docutils" id="id9">[DOCUTILS]</a>.  Das reicht für die Ausgabe von HTML Dateien. Falls Sie
+ausserdem Dokumente im PDF Format erzeugen wollen, müssen Sie <em>TeX</em>
+installieren, ich empfehle <a class="citation-reference" href="#texlive" id="id10">[TEXLIVE]</a>. Sie sollten auch noch diese
+Zusatzpakete für Latex installieren: <tt class="docutils literal"><span class="pre">texlive-latex-extra</span></tt> und
+<tt class="docutils literal"><span class="pre">texlive-lang-french</span></tt>.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="so-gehen-sie-vor">
+<h1><a class="toc-backref" href="#id16">3&nbsp;&nbsp;&nbsp;So gehen Sie vor</a></h1>
+<p>In diesem <a class="reference external" href="http://elk.informatik.fh-augsburg.de/pub/Demo-Bericht/">Verzeichnis</a> finden Sie das
+aktuelle ZIP Archiv des Demo-Berichtes.  Sie holen und entpacken es, dann
+sollten folgende Dateien in dem entpackten Unterverzeichnis <tt class="docutils literal"><span class="pre">Demo-Bericht</span></tt>
+zu finden sein:</p>
+<pre class="literal-block">
+bericht.cfg  bericht.rst  etc/  Makefile VERSION
+</pre>
+<p>Den Bericht tippen Sie in <tt class="docutils literal">bericht.rst</tt>. Sie können alle Markup Anweisungen
+von Restructured Text verwenden, eine gute Schnellreferenz finden Sie in
+<a class="citation-reference" href="#quickref" id="id11">[QUICKREF]</a>.</p>
+<p>In <tt class="docutils literal">bericht.cfg</tt> schreiben Sie den Titel des Berichtes, alle Namen mit
+Email-Adressen und Matrikelnummer der Projektgruppe. Auch das aktuelle Semester
+sollten Sie hier eintragen.</p>
+<p><strong>Linux</strong></p>
+<blockquote>
+<p>Sie können den Bericht durch ein Makefile sowohl im HTML- als auch
+im PDF-Format ausgeben. Geben Sie dazu das Kommando <tt class="docutils literal">make html</tt> oder <tt class="docutils literal">make
+pdf</tt> ein.   Damit dies funktioniert muss auf Ihrem Rechner das Paket
+<tt class="docutils literal"><span class="pre">python-docutils</span></tt> installiert sein. Darin gibt es unter anderem die Skripte
+<tt class="docutils literal">rst2html</tt> und <tt class="docutils literal">rst2latex</tt>, die das Makefile verwendet.</p>
+<p>Sie können alle generierten Dateien wieder löschen mit dem Kommando <tt class="docutils literal">make
+clean</tt>. Sollten die erzeugten Ausgabeformate nicht das enthalten, was Sie
+wollen, dann kann oft ein <tt class="docutils literal">make clean</tt> <em>vor</em> <tt class="docutils literal">make html</tt> oder <tt class="docutils literal">make
+pdf</tt> helfen.</p>
+</blockquote>
+<p><strong>Windows</strong></p>
+<blockquote>
+<p>Sie haben zwei Möglichkeiten:</p>
+<ol class="arabic">
+<li><p class="first">Installieren Sie die Unix Utilities und verwenden Sie wie auf Linux
+<tt class="docutils literal">make</tt>.</p>
+<p><a class="reference external" href="http://unxutils.sourceforge.net">http://unxutils.sourceforge.net</a></p>
+</li>
+<li><p class="first">Rufen Sie die Kommandos von Hand auf (oder schreiben Sie eine
+Batch Datei):</p>
+<p>HTML:</p>
+<pre class="literal-block">
+rst2html --language=de --stylesheet=etc/goodger.css \
+   bericht.rst bericht.html
+</pre>
+<p>PDF:</p>
+<pre class="literal-block">
+rst2latex --language=de \
+   --stylesheet=etc/pygments-docutilsroles.sty \
+   bericht.rst bericht.tex
+pdflatex bericht.tex
+pdflatex bericht.tex
+</pre>
+<p>Sie müssen zweimal <tt class="docutils literal">pdflatex</tt> laufen lassen, damit das
+Inhaltsverzeichnis erstellt wird.</p>
+</li>
+</ol>
+</blockquote>
+</div>
+<div class="section" id="so-funktioniert-es">
+<h1><a class="toc-backref" href="#id17">4&nbsp;&nbsp;&nbsp;So funktioniert es</a></h1>
+<p>Damit das Deckblatt des Berichtes einheitlich aussieht, müssen Sie es gar nicht
+selber schreiben, sondern es wird vom Computer automatisch erstellt. Sie müssen
+nur ein paar Daten in die Datei <a class="reference external" href="bericht.cfg">bericht.cfg</a> eingeben.  Die eingegebenen
+Daten sind in einem bestimmten Format, das von &quot;empy&quot; -- einem einfachen, in
+Python geschriebenen Template Programm -- verwendet wird.  Sie finden empy in
+<a class="reference external" href="etc/em.py">etc/em.py</a>. Empy ersetzt in <a class="reference external" href="etc/kopf.rst.in">etc/kopf.rst.in</a>,
+<a class="reference external" href="etc/titelseite.html.in">etc/titelseite.html.in</a> und <a class="reference external" href="etc/titelseite.tex.in">etc/titelseite.tex.in</a> die Templates durch
+den tatsächlichen Wert, der aus der Konfigurationsdatei genommen wird und
+erstellt dann die Dateien <em>ohne</em> die Endung <tt class="docutils literal">.in</tt>. Die Homepage von Empy
+ist <a class="citation-reference" href="#empy" id="id12">[EMPY]</a>.</p>
+</div>
+<div class="section" id="die-lizenz">
+<h1><a class="toc-backref" href="#id18">5&nbsp;&nbsp;&nbsp;Die Lizenz</a></h1>
+<p>Ich schlage vor, dem Bericht eine einheitliche Lizenz zu geben und zwar die
+Creative Commons Lizenz <a class="reference external" href="http://creativecommons.org/licenses/by-nc/3.0/de/">http://creativecommons.org/licenses/by-nc/3.0/de/</a>.
+Diese Lizenz finden Sie voreingestellt auf jeder Titelseite. Wenn Sie als
+Autorin und Autor nicht zustimmen, dann dürfen Sie gerne eine andere Lizenz
+wählen.  Schreiben Sie mir eine E-mail an &lt;<a class="reference external" href="mailto:Hubert.Hoegl&#64;hs-augsburg.de">Hubert.Hoegl&#64;hs-augsburg.de</a>&gt; falls
+Sie eine andere Lizenz wollen.</p>
+</div>
+<div class="section" id="ein-paar-fomatierungshinweise">
+<h1><a class="toc-backref" href="#id19">6&nbsp;&nbsp;&nbsp;Ein paar Fomatierungshinweise</a></h1>
+<p>Die <a class="citation-reference" href="#quickref" id="id13">[QUICKREF]</a> zeigt Ihnen schnell die wichtigsten allgemeinen
+Formatierungsbefehle, wie Schriftstile, Überschriften, Listen, Aufzählungen und
+so weiter.</p>
+<p>Da Sie im Praktikum häufig mit Quelltext zu tun haben werden, zeige ich Ihnen,
+wie man Quelltext einbindet, so dass die Syntax hervorgehoben wird
+(zumindest in der HTML Ausgabe).  Hier ist ein Beispiel für C Code:</p>
+<pre class="code c literal-block">
+<span class="ln">1 </span><span class="keyword type">int</span> <span class="name function">main</span><span class="punctuation">()</span>
+<span class="ln">2 </span><span class="punctuation">{</span>
+<span class="ln">3 </span>   <span class="name">printf</span><span class="punctuation">(</span><span class="literal string">&quot;Hello World</span><span class="literal string escape">\n</span><span class="literal string">&quot;</span><span class="punctuation">);</span>
+<span class="ln">4 </span>   <span class="name">exit</span> <span class="literal number integer">0</span><span class="punctuation">;</span>
+<span class="ln">5 </span><span class="punctuation">}</span>
+</pre>
+<p>Der reST Quelltext sieht dazu so aus:</p>
+<pre class="literal-block">
+.. code:: c
+   :number-lines: 1
+
+   int main()
+   {
+      printf(&quot;Hello World\n&quot;);
+      exit 0;
+   }
+</pre>
+<p>Das kleine <tt class="docutils literal">c</tt> hinter <tt class="docutils literal">code::</tt> gibt die Sprache an, es gibt für fast
+jede Sprache ein Kürzel, siehe <a class="reference external" href="http://pygments.org/languages">http://pygments.org/languages</a>.</p>
+<p><strong>Hinweis:</strong> Damit die Syntax bei eingebundenem Quelltext hervorgehoben wird,
+muss man eine relativ moderne Docutils Version verwenden.  Bei Versionen
+<em>kleiner als</em> 0.9.1 klappt es nicht! So findet man die Version heraus:</p>
+<pre class="literal-block">
+$ rst2html --version
+rst2html (Docutils 0.9.1 [release], Python 2.6.5, on linux2)
+</pre>
+<p>Sie können Code auch aus einer Datei importieren, das geht so:</p>
+<pre class="literal-block">
+.. include:: etc/demo.c
+   :code: c
+</pre>
+<p>So sieht das Ergebnis dann aus:</p>
+<pre class="code c literal-block">
+<span class="keyword type">int</span> <span class="name function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+   <span class="keyword type">int</span> <span class="name">i</span><span class="punctuation">;</span>
+   <span class="keyword">for</span> <span class="punctuation">(</span><span class="name">i</span><span class="operator">=</span><span class="literal number integer">0</span><span class="punctuation">;</span> <span class="name">i</span><span class="operator">&lt;</span><span class="literal number integer">10</span><span class="punctuation">;</span> <span class="name">i</span><span class="operator">++</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+      <span class="name">printf</span><span class="punctuation">(</span><span class="literal string">&quot;%d</span><span class="literal string escape">\n</span><span class="literal string">&quot;</span><span class="punctuation">,</span> <span class="name">i</span><span class="punctuation">);</span>
+   <span class="punctuation">}</span>
+   <span class="name">exit</span> <span class="literal number integer">0</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+</pre>
+<p>Abbildungen bauen Sie wie folgt ein:</p>
+<pre class="literal-block">
+.. figure:: img/python-powered-w-200x80.png
+   :align: center
+
+   Hier sind alle `Python Logos
+   &lt;http://www.python.org/community/logos/&gt;`_.
+</pre>
+<p>So sieht das Ergebnis aus:</p>
+<div class="figure align-center">
+<img alt="img/python-powered-w-200x80.png" src="img/python-powered-w-200x80.png" />
+<p class="caption">Hier sind alle <a class="reference external" href="http://www.python.org/community/logos/">Python Logos</a>.</p>
+</div>
+</div>
+<div class="section" id="mogliche-verbesserungen">
+<h1><a class="toc-backref" href="#id20">7&nbsp;&nbsp;&nbsp;Mögliche Verbesserungen</a></h1>
+<ul class="simple">
+<li>Man könnte das Programm anpassbar auf andere Veranstaltungen machen. Das
+heisst, der Name der Veranstaltung (Versuche aus der Technischen Informatik)
+und die Person, bei der abzugeben ist, könnten konfigurierbar sein.
+Ich würde mich freuen, wenn Studenten dieses Ideen in die Tat umsetzen würden</li>
+<li>Wahrscheinlich macht mein Ansatz mit <tt class="docutils literal">make</tt> Probleme unter Windows.
+Hier sollte noch eine Lösung gefunden werden, wie man unter Windows
+bequem mit der Bericht-Umgebung arbeiten kann.</li>
+</ul>
+<p>Ich freue mich auf Ihre Nachricht an &lt;<a class="reference external" href="mailto:Hubert.Hoegl&#64;hs-augsburg.de">Hubert.Hoegl&#64;hs-augsburg.de</a>&gt;.</p>
+</div>
+<div class="section" id="literatur">
+<h1><a class="toc-backref" href="#id21">8&nbsp;&nbsp;&nbsp;Literatur</a></h1>
+<table class="docutils citation" frame="void" id="docutils" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[DOCUTILS]</td><td><em>(<a class="fn-backref" href="#id5">1</a>, <a class="fn-backref" href="#id9">2</a>)</em> <p>Docutils Paket</p>
+<p class="last"><a class="reference external" href="http://docutils.sourceforge.net">http://docutils.sourceforge.net</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="rest" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[REST]</a></td><td><p class="first">reST Homepage</p>
+<p class="last"><a class="reference external" href="http://docutils.sourceforge.net/rst.html">http://docutils.sourceforge.net/rst.html</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="quickref" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[QUICKREF]</td><td><em>(<a class="fn-backref" href="#id11">1</a>, <a class="fn-backref" href="#id13">2</a>)</em> <p>reST Quick Reference</p>
+<p class="last"><a class="reference external" href="http://docutils.sourceforge.net/docs/user/rst/quickref.html">http://docutils.sourceforge.net/docs/user/rst/quickref.html</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="python" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[PYTHON]</td><td><em>(<a class="fn-backref" href="#id4">1</a>, <a class="fn-backref" href="#id8">2</a>)</em> <p>Python Interpreter</p>
+<p class="last"><a class="reference external" href="http://www.python.org">http://www.python.org</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="pydoc" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[PYDOC]</a></td><td><p class="first">Python Standard Dokumentation</p>
+<p class="last"><a class="reference external" href="http://www.python.org/doc">http://www.python.org/doc</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="sphinx" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[SPHINX]</a></td><td><p class="first">Python Documentation Generator</p>
+<p class="last"><a class="reference external" href="http://sphinx.pocoo.org">http://sphinx.pocoo.org</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="miktex" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[MIKTEX]</a></td><td><p class="first">TeX und LaTeX für Windows</p>
+<p class="last"><a class="reference external" href="http://miktex.org">http://miktex.org</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="texlive" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[TEXLIVE]</td><td><em>(<a class="fn-backref" href="#id7">1</a>, <a class="fn-backref" href="#id10">2</a>)</em> <p>TeX Live</p>
+<p class="last"><a class="reference external" href="http://www.tug.org/texlive">http://www.tug.org/texlive</a></p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="empy" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id12">[EMPY]</a></td><td><p class="first">Empy Macro Processor</p>
+<p class="last"><a class="reference external" href="http://www.alcyone.com/software/empy">http://www.alcyone.com/software/empy</a></p>
+</td></tr>
+</tbody>
+</table>
+<!-- vim: et sw=4 ts=4 -->
+</div>
+</div>
+</body>
+</html>

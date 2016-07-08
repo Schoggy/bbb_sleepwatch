@@ -1,0 +1,44 @@
+@empy.include("bericht.cfg")
+
+<img src="img/hsa-logo.jpg" width="200" 
+     alt="Logo der Hochschule Augsburg" align=right vspace="0">
+
+<p>
+
+<h2>@(ueberschrift)</h2>
+
+@(fach)<br>
+Hochschule Augsburg <br>
+@(fakultaet) (@prof) <br>
+Studiengang @(studiengang), @(semzahl). Semester <br>
+@(semester) <br>
+<!-- print date -->
+Datum: @{
+import time
+print time.strftime("%Y-%m-%d %H:%M", time.localtime(time.time()))
+}@
+
+<p>
+
+@{
+S = namen.split("\n")
+for x in S:
+    x = x.strip()
+    if not x:
+	continue
+    else:
+        name, email, matnr = x.split(',')
+        print name+',', "&lt;"+email.strip()+"&gt;"+',', matnr, r"<br>"
+}@
+
+<hr>
+<img src=img/cc-logo.jpg width="150" alt="cc-logo"><br>
+Dieser Text steht unter der Creative Commons Lizenz 
+<a href="http://creativecommons.org/licenses/by-nc/3.0/de/">"Namensnennung/Keine kommerizelle Nutzung"<a/>
+
+
+<center>
+          <h2>@(titel)</h2>
+</center>
+
+

@@ -1,0 +1,75 @@
+@empy.include("bericht.cfg")
+
+\ \ 
+\hfill
+\begin{minipage}[t]{5cm}
+\includegraphics[width=5cm]{img/hsa-logo.jpg}
+\end{minipage}
+
+\vskip 10mm
+
+{\parindent=0pt
+
+\thispagestyle{empty}
+
+
+{\Large\bf @(ueberschrift)}
+
+\vskip 5mm
+
+@(fach) \\
+Hochschule Augsburg \\
+@(fakultaet) (@(prof)) \\
+Studiengang @(studiengang), @(semzahl). Semester \\
+@(semester) 
+
+Datum: @{
+import time
+print time.strftime("%Y-%m-%d %H:%M", time.localtime(time.time())), r"\\"
+}@
+
+\medskip
+
+\rule{10cm}{4pt}\\
+
+\medskip
+
+@{
+S = namen.split("\n")
+for x in S:
+    x = x.strip()
+    if not x:
+	continue
+    else:
+	name, email, matnr = x.split(',')
+        matnr = matnr.strip()
+        n = matnr.find('#')
+        if n >= 0:
+            matnr = "\\" + matnr
+        print name+',', "$<$"+email.strip()+"$>$"+',', matnr, r"\\"
+}@
+
+
+\vskip 2cm
+
+\begin{center}
+{\LARGE\bf
+@(titel)
+}
+\end{center}
+
+\vfill
+
+\begin{minipage}[t]{3cm}
+\includegraphics[width=3cm]{img/cc-logo.jpg}
+\end{minipage}
+
+{\small
+Dieser Text steht unter der Creative Commons Lizenz "Namensnennung/Keine kommerizelle Nutzung"\\
+http://creativecommons.org/licenses/by-nc/3.0/de/
+}
+
+} % parindent
+
+
+\newpage

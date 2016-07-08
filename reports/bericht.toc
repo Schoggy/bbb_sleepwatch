@@ -1,0 +1,9 @@
+\select@language {ngerman}
+\contentsline {section}{1~~~Einleitung}{2}{section*.3}
+\contentsline {section}{2~~~Vorbereiten des Rechners}{3}{section*.4}
+\contentsline {section}{3~~~So gehen Sie vor}{3}{section*.5}
+\contentsline {section}{4~~~So funktioniert es}{4}{section*.6}
+\contentsline {section}{5~~~Die Lizenz}{4}{section*.7}
+\contentsline {section}{6~~~Ein paar Fomatierungshinweise}{5}{section*.8}
+\contentsline {section}{7~~~M\IeC {\"o}gliche Verbesserungen}{6}{section*.9}
+\contentsline {section}{8~~~Literatur}{6}{section*.10}
