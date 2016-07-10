@@ -1,20 +1,22 @@
 #include "sqlite_db.h"
 
-int init_db(char* file){
-  DBO *db;
+int init_db(char* file, char newdb){
   int sql_res;
   sql_res = sqlite3_open(file, &db);
-  if(sql_res == SQLITE_OK){
-    db_file = (char*) calloc(sizeof(file), sizeof(char));
-    strncpy(db_file, file, sizeof(file));
-  }
   
-  char str_stmt[28];
+  if(newdb){
+    if(build_new_db() != 0){
+      logc("ERROR building new database in file: ", file);
+      return 1;
+    }
+    logc("INFO successfully initialized database with empty tables in: ", file);
+  } 
+  
+  char *str_stmt = (char*) calloc(28, sizeof(char));
   char sensnr;
   sqlite3_stmt *crt_stmt;
   for(sensnr = 0; sensnr < 5; sensnr++){
     char *tablename = get_tablename(sensnr);
-    memset(str_stmt, '\0', 28);
     strncat(str_stmt, "SELECT max(mnr) FROM ", 21);
     strncat(str_stmt, tablename, 5);
     strncat(str_stmt, ";\0", 2);
@@ -22,104 +24,72 @@ int init_db(char* file){
     free(tablename);
     
     // "compile" the SQL statement
-    sql_res = sqlite3_prepare_v2(db, str_stmt, sizeof(str_stmt), &crt_stmt, 0);
+    sql_res = sqlite3_prepare_v2(db, str_stmt, -1, &crt_stmt, 0);
     
     if(sql_res != SQLITE_OK){
       logcn("ERROR parsing SQL statement! : ", str_stmt, sql_res);
+      exit_db();
       return 1;
     }
   
     // run the SQL statement
     sql_res = sqlite3_step(crt_stmt);
-  
-    if(sql_res != SQLITE_ROW || SQLITE_DONE){
+
+    if(sql_res != SQLITE_ROW && sql_res != SQLITE_DONE){
       logcn("ERROR SQL statement was unable to complete! : ", str_stmt, sql_res);
       sqlite3_finalize(crt_stmt);
+      exit_db();
       return 1;
-    }  
+    }
+    memset(str_stmt, '\0', 28);
     mnr_cnts[sensnr] = sqlite3_column_int64(crt_stmt, 0);  
   }
-  
-  sqlite3_close(db);
+  free(str_stmt);
   return sql_res;
 }
 
-int init_sql(char* file, DBO* db){
-  return sqlite3_open(file, &db);
-}
-
 void exit_db(void){
-  free(db_file);
-}
-
-void exit_sql(DBO* db){
   sqlite3_close(db);
 }
 
 int insert_db(char sensnr, int* value){
-  DBO *db;
   STMT *crt_stmt;
   int sql_res;
   
   // get the SQL code in string form 
   crt_stmt = build_insert_stmt(sensnr, value);
   
-  // init sqlite3
-  sql_res = init_sql(db_file, db);
-  if(sql_res != SQLITE_OK){
-    logn("ERROR opening SQL database file!", sql_res);
-    return sql_res;
-  }
-  
   // execute the SQL statement
-  sql_res = exec_sql(crt_stmt, db);
+  sql_res = exec_sql(crt_stmt);
   if(sql_res){
     logcn("ERROR executing SQL INSERT statement! : ", crt_stmt->stmnt, sql_res);
-    exit_sql(db);
     return sql_res;
   }
   
   // free memory
-  free(crt_stmt);
-  
-  // shut down the database
-  exit_sql(db);
+  destroy_stmt(crt_stmt);
   return 0;
 }
 
 TABLE* query_db(char sensnr, char* s_time, char* e_time){
-  DBO *db;
   STMT *crt_stmt;
-  int sql_res;
   TABLE *result;
   
   // get the SQL code in string form 
   crt_stmt = build_query_time_stmt(sensnr, s_time, e_time);
   
-  // init sqlite3
-  sql_res = init_sql(db_file, db);
-  if(sql_res != SQLITE_OK){
-    logn("ERROR opening SQL database file!", sql_res);
-    return NULL;
-  }
-  
   // execute the SQL statement
-  result = exec_sql_ret(crt_stmt, db);
+  result = exec_sql_ret(crt_stmt);
   if(result == NULL){
     logc("ERROR executing SQL query! : ", crt_stmt->stmnt);
-    exit_sql(db);
     return NULL;
   }
-    
-  free(crt_stmt);
-  
-  // shut down the database
-  exit_sql(db);
+  mnr_cnts[sensnr]++;
+  destroy_stmt(crt_stmt);
   return result;
 }
 
 TABLE* tail_db(char sensnr, int nr){
-  DBO *db;
   STMT *crt_stmt;
   int sql_res;
   TABLE *result;
@@ -127,36 +97,28 @@ TABLE* tail_db(char sensnr, int nr){
   // get the SQL code in string form 
   crt_stmt = build_query_tail_stmt(sensnr, nr);
   
-  // init sqlite3
-  sql_res = init_sql(db_file, db);
-  if(sql_res != SQLITE_OK){
-    logn("ERROR opening SQL database file!", sql_res);
-    return NULL;
-  }
-  
   // execute the SQL statement
-  result = exec_sql_ret(crt_stmt, db);
+  result = exec_sql_ret(crt_stmt);
   if(result == NULL){
     logc("ERROR executing SQL query! : ", crt_stmt->stmnt);
-    exit_sql(db);
     return NULL;
   }
     
-  free(crt_stmt);
-    
-  // shut down the database
-  exit_sql(db);
+  destroy_stmt(crt_stmt);
+
   return result;
 }
 
-int exec_sql(STMT* cstmt, DBO* db){
+int exec_sql(STMT* cstmt){
   sqlite3_stmt *crt_stmt;
-  
+  int sql_res;
+    
   // "compile" the SQL statement
-  int sql_res = sqlite3_prepare_v2(db, cstmt->stmnt, cstmt->length, &crt_stmt, 0);
+  sql_res = sqlite3_prepare_v2(db, cstmt->stmnt, -1, &crt_stmt, 0);
     
   if(sql_res != SQLITE_OK){
     logcn("ERROR parsing SQL statement! : ", cstmt->stmnt, sql_res);
+    exit_db();
     return sql_res;
   }
   
@@ -165,35 +127,40 @@ int exec_sql(STMT* cstmt, DBO* db){
   
   if(sql_res != SQLITE_DONE){
     logcn("ERROR SQL statement was unable to complete! : ", cstmt->stmnt, sql_res);
+    sqlite3_finalize(crt_stmt);
+    exit_db();
     return sql_res;
   }
   
   // clean up the statement
   sqlite3_finalize(crt_stmt);
-  
+
   return 0;
 }
 
-TABLE* exec_sql_ret(STMT* cstmt, DBO* db){
+TABLE* exec_sql_ret(STMT* cstmt){
   sqlite3_stmt *crt_stmt;
   TABLE *out;
+  int sql_res;
   out = (TABLE*) calloc(1, sizeof(TABLE));
   out->linecount = 0;
   
   // "compile" the SQL statement
-  int sql_res = sqlite3_prepare_v2(db, cstmt->stmnt, cstmt->length, &crt_stmt, 0);
+  sql_res = sqlite3_prepare_v2(db, cstmt->stmnt, -1, &crt_stmt, 0);
     
   if(sql_res != SQLITE_OK){
     logcn("ERROR parsing SQL statement! : ", cstmt->stmnt, sql_res);
+    exit_db();
     return NULL;
   }
   
   // run the SQL statement
   sql_res = sqlite3_step(crt_stmt);
   
-  if(sql_res != SQLITE_ROW || SQLITE_DONE){
+  if(sql_res != SQLITE_ROW && sql_res != SQLITE_DONE){
     logcn("ERROR SQL statement was unable to complete! : ", cstmt->stmnt, sql_res);
     sqlite3_finalize(crt_stmt);
+    exit_db();
     return NULL;
   }
   
@@ -217,9 +184,10 @@ TABLE* exec_sql_ret(STMT* cstmt, DBO* db){
       }
       
       // collect data
-      lines->mnr = sqlite3_column_int64(crt_stmt, 0);
-      strncpy(lines->mtimestamp, sqlite3_column_text(crt_stmt, 1), 20);
-      lines->value = sqlite3_column_int(crt_stmt, 2);
+      (lines + out->linecount - 1)->mnr = sqlite3_column_int64(crt_stmt, 0);
+      char *str_date = sqlite3_column_text(crt_stmt, 1);
+      strncpy((lines + out->linecount - 1)->mtimestamp, str_date, strlen(str_date));
+      (lines + out->linecount - 1)->value = sqlite3_column_int(crt_stmt, 2);
       
       // next step
       sql_res = sqlite3_step(crt_stmt);
@@ -232,31 +200,30 @@ TABLE* exec_sql_ret(STMT* cstmt, DBO* db){
     if(sql_res != SQLITE_DONE){
       logcn("ERROR while stepping through SQL statement with return values! : ", cstmt->stmnt, sql_res);
       sqlite3_finalize(crt_stmt);
+      exit_db();
       return out;
     }
   }
   // clean up the statement
   sqlite3_finalize(crt_stmt);
-  
   return out;
 }
 
 STMT* build_insert_stmt(char sensnr, int* value){
-  STMT *out;
-  out = (STMT*) calloc(1, sizeof(STMT)); 
-  char str_stmt[100];
-  char tempstr[73];
+  STMT *out = (STMT*) malloc(sizeof(STMT));
+  char *str_stmt = (char*) calloc(100, sizeof(char));
+  char *tempstr = (char*) calloc(73, sizeof(char));
   // get database table name
   char *tablename = get_tablename(sensnr);
   
   // build the statement
-  memset(str_stmt, '\0', 100);
   strncpy(str_stmt, "INSERT INTO ", 12);
   strncat(str_stmt, tablename, 5);
-  snprintf(tempstr, 73," (mnr, mtimestamp, value) VALUES (%li, datetime('now'), %i);\0", mnr_cnts[sensnr] + 1, *value);
-  strncat(str_stmt, tempstr, 73);  
+  sprintf(tempstr," (mnr, mtimestamp, value) VALUES (%li, datetime('now'), %i);", mnr_cnts[sensnr] + 1, *value);
+  strncat(str_stmt, tempstr, strlen(tempstr));
   
   free(tablename);
+  free(tempstr);
   
   // set output
   out->length = 100;
@@ -266,10 +233,9 @@ STMT* build_insert_stmt(char sensnr, int* value){
 }
 
 STMT* build_query_tail_stmt(char sensnr, int nr){
-  STMT *out;
-  out = (STMT*) calloc(1, sizeof(STMT));
-  char str_stmt[100];
-  char tempstr[16];
+  STMT *out = (STMT*) malloc(sizeof(STMT));
+  char *str_stmt = (char*) calloc(100, sizeof(char));
+  char *tempstr = (char*) calloc(16, sizeof(char));
   // get database table name
   char *tablename = get_tablename(sensnr);
   
@@ -283,7 +249,8 @@ STMT* build_query_tail_stmt(char sensnr, int nr){
   strncat(str_stmt, tempstr, 12);
   
   free(tablename);
-  
+  free(tempstr);
+
   out->length = 100;
   out->stmnt = str_stmt;
   
@@ -291,20 +258,18 @@ STMT* build_query_tail_stmt(char sensnr, int nr){
 }
 
 STMT* build_query_time_stmt(char sensnr, char* from, char* to){
-  STMT *out;
-  out = (STMT*) calloc(1, sizeof(STMT));
-  out->length = 52 + sizeof(from) + sizeof(to);
-  char str_stmt[out->length];
+  STMT *out = (STMT*) malloc(sizeof(STMT));
+  out->length = 52 + strlen(from) + strlen(to);
+  char* str_stmt = (char*) calloc(out->length, sizeof(char));
   char* tablename = get_tablename(sensnr);
   
   // build the statement
-  memset(str_stmt, '\0', out->length);
   strncpy(str_stmt, "SELECT * FROM ", 14);
   strncat(str_stmt, tablename, 5);
   strncat(str_stmt, " WHERE mtimestamp BETWEEN ", 26);
-  strncat(str_stmt, from, sizeof(from));
+  strncat(str_stmt, from, strlen(from));
   strncat(str_stmt, " AND ", 5);
-  strncat(str_stmt, to, sizeof(to));
+  strncat(str_stmt, to, strlen(to));
   strncat(str_stmt, ";\0", 2);
   
   free(tablename);
@@ -326,16 +291,16 @@ char* get_tablename(char sensnr){
       out[0] = 'l';
     } break;
     case 1: {
-      out[1] = 'm';
+      out[0] = 'm';
     } break;
     case 2: {
-      out[2] = 't';
+      out[0] = 't';
     } break;
     case 3: {
-      out[3] = 'h';
+      out[0] = 'h';
     } break;
     case 4: {
-      out[4] = 'g';
+      out[0] = 'g';
     } break;
     default: {
       logn("ERROR invalid sensor number in get_tablename!", sensnr);
@@ -347,20 +312,13 @@ char* get_tablename(char sensnr){
 
 
 int build_new_db(void){
-  char str_stmt[137];
+  char *str_stmt = (char*) calloc(137, sizeof(char));
   char sensnr;
-  STMT crt_stmt;
+  STMT *crt_stmt = (STMT*) malloc(sizeof(STMT));
   int sql_res;
-  DBO *db;
   
-  sql_res = init_sql(db_file, db);
-  if(sql_res != SQLITE_OK){
-    logn("ERROR opening SQL database file!", sql_res);
-    return sql_res;
-  }
-  
-  crt_stmt.length = 137;
-  crt_stmt.stmnt = str_stmt;
+  crt_stmt->length = 137;
+  crt_stmt->stmnt = str_stmt;
   
   for(sensnr = 0; sensnr < 5; sensnr++){
     char *tablename = get_tablename(sensnr);
@@ -370,20 +328,27 @@ int build_new_db(void){
     strncat(str_stmt, " (mnr NUMBER NOT NULL ,mtimestamp VARCHAR NOT NULL ,value NUMBER NOT NULL ,CONSTRAINT ", 86);
     strncat(str_stmt, tablename, 5);
     strncat(str_stmt, "_mnr_pk PRIMARY KEY (mnr));\0", 28);
-    
+    str_stmt[137] = '\0';
+
     free(tablename);
     
-    sql_res = exec_sql(&crt_stmt, db);
+    sql_res = exec_sql(&crt_stmt);
     if(sql_res){
       logcn("ERROR create table statement failed! : ", str_stmt, sql_res);
-      exit_sql(db);
       return sql_res;
     }
   }
+  destroy_stmt(crt_stmt);
   
-  exit_sql(db);
-  logc("INFO successfully initialized database with empty tables in: ", db_file);
   return 0;
 }
 
+void destroy_stmt(STMT* cstmt){
+  free(cstmt->stmnt);
+  free(cstmt);
+}
 
+void destroy_table(TABLE* t){
+  free(t->lines);
+  free(t);
+}

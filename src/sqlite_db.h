@@ -1,3 +1,6 @@
+#ifndef SW_SQLITE3_H
+#define SW_SQLITE3_H
+
 #include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,27 +46,26 @@ typedef struct str_stmnt{
 
 typedef sqlite3 DBO;
 
-char* db_file;
+DBO *db;
 long mnr_cnts[5];
 
-int init_db(char* file);
+int init_db(char* file, char newdb);
 int build_new_db(void);
 int insert_db(char sensnr, int* value);
 TABLE* query_db(char sensnr, char* s_time, char* e_time);
 TABLE* tail_db(char sensnr, int nr);
 void exit_db(void);
 
-int init_sql(char* file, DBO* db);
-void exit_sql(DBO* db);
-int exec_sql(STMT* cstmt, DBO* db);
-TABLE* exec_sql_ret(STMT* cstmt, DBO* db);
+void destroy_stmt(STMT* cstmt);
+int exec_sql(STMT* cstmt);
+TABLE* exec_sql_ret(STMT* cstmt);
 STMT* build_insert_stmt(char sensnr, int* value);
 STMT* build_query_tail_stmt(char sensnr, int nr);
 STMT* build_query_time_stmt(char sensnr, char* from, char* to);
 char* get_tablename(char sensnr);
+void destroy_table(TABLE* t);
 
-
-
+#endif //SW_SQLITE3_H
 
 
 
