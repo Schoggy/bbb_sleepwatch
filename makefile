@@ -3,7 +3,7 @@ src_folder = src/
 cfn = sleepwatch_test.a
 
 compiler = gcc
-compiler_args = -ggdb -I $(src_folder)
+compiler_args = -std=gnu99 -ggdb -I $(src_folder)
 linker_args = -lsqlite3
 
 formatter = clang-format
