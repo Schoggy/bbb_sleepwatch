@@ -46,57 +46,23 @@ typedef struct str_stmnt {
 
 typedef sqlite3 DBO;
 
-// global database interface pointer
 DBO *db;
-
-// "API" FUNCTIONS
-
-// holds highest mnr for each table (primary key)
 long mnr_cnts[5];
 
-// initialize database interface, create tables and/or init mnrcnts
 int init_db(char *file, char newdb);
-
-// executes the necessary create table statements
 int build_new_db(void);
-
-// adds value to the database
 int insert_db(char sensnr, int *value);
-
-// executes a select statement to grab values between s_time and e_time
 TABLE *query_db(char sensnr, char *s_time, char *e_time);
-
-// executes a select statement to grab the last nr of lines written to the database
 TABLE *tail_db(char sensnr, int nr);
-
-// releases all memory held by a TABLE variable
-void destroy_table(TABLE *t);
-
-// releases the database interface
 void exit_db(void);
 
-// INTERNAL FUNCTIONS
-
-// frees all memory held by a STMT variable
 void destroy_stmt(STMT *cstmt);
-
-// executes a SQL statement without a return value
 int exec_sql(STMT *cstmt);
-
-// executes a SQL statement with a return value in the form (LONG NUMBER, VARCHAR, NUMBER);
 TABLE *exec_sql_ret(STMT *cstmt);
-
-// returns an INSERT SQL statement for sensor sensnr and value
 STMT *build_insert_stmt(char sensnr, int *value);
-
-// builds a SELECT SQL statement to return the last nr of lines
 STMT *build_query_tail_stmt(char sensnr, int nr);
-
-// builds a SELECT SQL statement to return all lines between from and to
-// from and to need to be sqlite "datetime()" statements
 STMT *build_query_time_stmt(char sensnr, char *from, char *to);
-
-// returns the name of the table for sensor sensnr
 char *get_tablename(char sensnr);
+void destroy_table(TABLE *t);
 
 #endif // SW_SQLITE3_H

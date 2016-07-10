@@ -137,7 +137,7 @@ int grab_value(char sensnr) {
   return out;
 }
 
-void close_watch(void) {
+void close_buffers(void) {
   char cntr = 0;
   for (; cntr < 5; cntr++) {
     free((bufarr + cntr)->s_ptr);

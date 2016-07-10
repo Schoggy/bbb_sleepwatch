@@ -19,6 +19,7 @@ void logm(char *message) {
   if (log != NULL) {
     fwrite(message, sizeof(char), strlen(message), log);
     fputc('\n', log);
+    // fprintf(log, "%s", message);
   } else {
     fprintf(stderr, "ERROR log file could not be opened!");
     fprintf(stderr, "%s", message);

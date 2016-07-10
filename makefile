@@ -1,9 +1,10 @@
 src_folder = src/
 
-cfn = file_sum_compiled.a
+cfn = sleepwatch_test.a
 
 compiler = gcc
 compiler_args = -ggdb -I $(src_folder)
+linker_args = -lsqlite3
 
 formatter = clang-format
 formatter_args = -style="LLVM" -i
@@ -30,10 +31,10 @@ info:
 compile: _dot_o _compile_final
 
 _dot_o:
-	$(compiler) $(compiler_args) $(src_folder)*.c src/dht/*.c src/dht/BBB/*.c -c 
+	$(compiler) $(compiler_args) src/dht/*.c src/dht/BBB/*.c $(src_folder)*.c -c 
 
 _compile_final:
-	$(compiler) $(compiler_args) *.o -o $(cfn)
+	$(compiler) $(compiler_args) *.o -o $(cfn) $(linker_args)
 
 run: compile
 	./$(cfn)
@@ -52,7 +53,7 @@ time: compile
 
 format: 
 	$(formatter) $(formatter_args) $(src_folder)*.c
-	#$(formatter) $(formatter_args) $(src_folder)*.h
+	$(formatter) $(formatter_args) $(src_folder)*.h
 
 clean_all: clean clean_wiggly remove_exec
 	

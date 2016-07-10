@@ -64,7 +64,7 @@ int insert_db(char sensnr, int *value) {
     logcn("ERROR executing SQL INSERT statement! : ", crt_stmt->stmnt, sql_res);
     return sql_res;
   }
-  mnr_cnts[sensnr]++;
+
   // free memory
   destroy_stmt(crt_stmt);
   return 0;
@@ -83,7 +83,7 @@ TABLE *query_db(char sensnr, char *s_time, char *e_time) {
     logc("ERROR executing SQL query! : ", crt_stmt->stmnt);
     return NULL;
   }
-
+  mnr_cnts[sensnr]++;
   destroy_stmt(crt_stmt);
   return result;
 }
@@ -249,6 +249,7 @@ STMT *build_query_tail_stmt(char sensnr, int nr) {
   char *tablename = get_tablename(sensnr);
 
   // build the statement
+  memset(str_stmt, '\0', 100);
   strncpy(str_stmt, "SELECT * FROM ", 14);
   strncat(str_stmt, tablename, 5);
   strncat(str_stmt, " WHERE mnr > (SELECT max(mnr) FROM ", 35);
