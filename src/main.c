@@ -12,4 +12,7 @@ int main() {
   init_log(logfile);
   init_watch();
   init_db(dbfile, 1);
+  
+  close_db();
+  close_watch();
 }

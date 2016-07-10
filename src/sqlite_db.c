@@ -49,7 +49,7 @@ int init_db(char *file, char newdb) {
   return sql_res;
 }
 
-void exit_db(void) { sqlite3_close(db); }
+void close_db(void) { sqlite3_close(db); }
 
 int insert_db(char sensnr, int *value) {
   STMT *crt_stmt;
@@ -90,7 +90,6 @@ TABLE *query_db(char sensnr, char *s_time, char *e_time) {
 
 TABLE *tail_db(char sensnr, int nr) {
   STMT *crt_stmt;
-  int sql_res;
   TABLE *result;
 
   // get the SQL code in string form
@@ -151,6 +150,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
   if (sql_res != SQLITE_OK) {
     logcn("ERROR parsing SQL statement! : ", cstmt->stmnt, sql_res);
     exit_db();
+    free(out);
     return NULL;
   }
 
@@ -162,6 +162,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
           sql_res);
     sqlite3_finalize(crt_stmt);
     exit_db();
+    free(out);
     return NULL;
   }
 
@@ -175,6 +176,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
     int buffsize = 32;
     LINE *lines;
     lines = (LINE *)calloc(buffsize, sizeof(LINE));
+    LINE *lines_new;
 
     // continue statement as long as there is data
     while (sql_res == SQLITE_ROW) {
@@ -183,7 +185,14 @@ TABLE *exec_sql_ret(STMT *cstmt) {
       // if necessary resize buffer
       if (out->linecount > buffsize) {
         buffsize += buffsize / 2;
-        lines = (LINE *)realloc(lines, buffsize * sizeof(LINE));
+        lines_new = (LINE *)realloc(lines, buffsize * sizeof(LINE));
+        if(lines_new == NULL){
+          logn("ERROR not enough memory! realloc failed for size of:", buffsiz * sizeof(LINE));
+          free(lines);
+          return NULL;
+        } else {
+          lines = lines_new;
+        }
       }
 
       // collect data
@@ -200,8 +209,14 @@ TABLE *exec_sql_ret(STMT *cstmt) {
     }
 
     // reallocate so there are no empty lines
-    lines = (LINE *)realloc(lines, out->linecount * sizeof(LINE));
-
+    lines_new = (LINE *)realloc(lines, out->linecount * sizeof(LINE));
+    if(lines_new == NULL){
+      logn("ERROR not enough memory! realloc failed for size of:", buffsiz * sizeof(LINE));
+      free(lines);
+      return NULL;
+    } else {
+      lines = lines_new;
+    }
     out->lines = lines;
     if (sql_res != SQLITE_DONE) {
       logcn("ERROR while stepping through SQL statement with return values! : ",
@@ -312,6 +327,7 @@ char *get_tablename(char sensnr) {
   } break;
   default: {
     logn("ERROR invalid sensor number in get_tablename!", sensnr);
+    free(out);
     return NULL;
   } break;
   }
@@ -319,7 +335,7 @@ char *get_tablename(char sensnr) {
 }
 
 int build_new_db(void) {
-  char *str_stmt = (char *)calloc(137, sizeof(char));
+  char *str_stmt = (char *)malloc(137, sizeof(char));
   char sensnr;
   STMT *crt_stmt = (STMT *)malloc(sizeof(STMT));
   int sql_res;

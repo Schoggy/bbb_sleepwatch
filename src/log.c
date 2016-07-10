@@ -30,7 +30,7 @@ void logm(char *message) {
 void logn(char *message, int nr) {
   char *temp;
   char str_nr[13];
-  temp = (char *)malloc((strlen(message) + 13) * sizeof(char));
+  temp = (char *)calloc((strlen(message) + 13) * sizeof(char));
   strncpy(temp, message, strlen(message));
   snprintf(str_nr, 13, " : %i", nr);
   strncat(temp, str_nr, 13);
@@ -40,7 +40,7 @@ void logn(char *message, int nr) {
 
 void logc(char *message, char *code) {
   char *temp;
-  temp = (char *)malloc(strlen(message) + strlen(code) * sizeof(char));
+  temp = (char *)calloc(strlen(message) + strlen(code) * sizeof(char));
   strncpy(temp, message, strlen(message));
   strncat(temp, code, strlen(code));
   logm(temp);
@@ -49,7 +49,7 @@ void logc(char *message, char *code) {
 
 void logcn(char *message, char *code, int nr) {
   char *temp;
-  temp = (char *)malloc(strlen(message) + strlen(code) * sizeof(char));
+  temp = (char *)calloc(strlen(message) + strlen(code) * sizeof(char));
   strncpy(temp, message, strlen(message));
   strncat(temp, code, strlen(code));
   logn(temp, nr);

@@ -78,13 +78,14 @@ int read_adc(char *adcfile) {
 
   fread(cval, 1, 4, file);
   for (; cntr < 4; cntr++) {
-    if (cval[cntr] < 30 && cval[cntr] > 39) {
+    if (cval[cntr] < 30 || cval[cntr] > 39) {
       cval[cntr] = '\0';
       cntr = 4;
     }
   }
   out = atoi(cval);
   free(cval);
+  fclose(file);
   return out;
 }
 

@@ -73,7 +73,7 @@ TABLE *tail_db(char sensnr, int nr);
 void destroy_table(TABLE *t);
 
 // releases the database interface
-void exit_db(void);
+void close_db(void);
 
 // INTERNAL FUNCTIONS
 
