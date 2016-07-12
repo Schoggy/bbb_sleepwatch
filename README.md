@@ -2,6 +2,8 @@
 
 A project to build a small system logging various parameters while you sleep!
 
+This is a project within the scope of the course "Embedded Linux" at the Univerity of Applied Science Augsburg.
+
 Currently it's planned to log the following values:
 
  - room temperature
