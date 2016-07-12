@@ -2,9 +2,12 @@
 
 void init_watch(void) {
   // init adc
-  system("export SLOTS=/sys/devices/platform/bone_capemgr/slots");
-  system("sh -c \"echo BB-ADC > $SLOTS\"");
-
+  FILE* test = fopen(ADC_FILE0, "r");
+  if(test == NULL){
+    system("echo BB-ADC > /sys/devices/platform/bone_capemgr/slots");
+  } else {
+    fclose(test);
+  }
   // init buffers
   char bufsizes[5] = {50, 200, 2, 2, 2};
   bufarr = (BUF *)malloc(5 * sizeof(BUF));
@@ -73,16 +76,16 @@ int read_adc(char *adcfile) {
     return -1;
   }
   char *cval = (char *)calloc(5, sizeof(char));
-  char cntr = 0;
+  //char cntr = 0;
   int out;
 
   fread(cval, 1, 4, file);
-  for (; cntr < 4; cntr++) {
+  /*for (; cntr < 4; cntr++) {
     if (cval[cntr] < 30 || cval[cntr] > 39) {
       cval[cntr] = '\0';
       cntr = 4;
     }
-  }
+  }*/
   out = atoi(cval);
   free(cval);
   fclose(file);
@@ -151,11 +154,13 @@ int flush_buffer_to_db(void) {
   int akk;
   for (cntr_o = 0; cntr_o < 5; cntr_o++) {
     akk = 0;
-    for (cntr_i = 0; (bufarr + cntr_o)->r_ptr == (bufarr + cntr_o)->w_ptr;
+    for (cntr_i = 0; (bufarr + cntr_o)->r_ptr != (bufarr + cntr_o)->w_ptr;
          cntr_i++) {
       akk += grab_value(cntr_o);
     }
-    akk /= cntr_i + 1;
-    insert_db(cntr_o, &akk);
+    if(cntr_i){
+      akk /= cntr_i;
+      insert_db(cntr_o, &akk);
+    }
   }
 }

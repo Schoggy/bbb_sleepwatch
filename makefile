@@ -36,6 +36,9 @@ _dot_o:
 _compile_final:
 	$(compiler) $(compiler_args) *.o -o $(cfn) $(linker_args)
 
+debug: compile
+	gdb -directory=src/ -tui -se=./$(cnf)
+
 run: compile
 	./$(cfn)
 

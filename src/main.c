@@ -11,7 +11,12 @@ int main() {
 
   init_log(logfile);
   init_watch();
-  init_db(dbfile, 1);
+  init_db(dbfile, 0);
   
+  watch_sensor(LSENS);
+  watch_sensor(GSENS);
+  
+  flush_buffer_to_db();  
+
   close_watch();
 }
