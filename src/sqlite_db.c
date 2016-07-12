@@ -28,7 +28,7 @@ int init_db(char *file, char newdb) {
 
     if (sql_res != SQLITE_OK) {
       logcn("ERROR parsing SQL statement! : ", str_stmt, sql_res);
-      exit_db();
+      close_db();
       return 1;
     }
 
@@ -39,7 +39,7 @@ int init_db(char *file, char newdb) {
       logcn("ERROR SQL statement was unable to complete! : ", str_stmt,
             sql_res);
       sqlite3_finalize(crt_stmt);
-      exit_db();
+      close_db();
       return 1;
     }
     memset(str_stmt, '\0', 28);
@@ -116,7 +116,7 @@ int exec_sql(STMT *cstmt) {
 
   if (sql_res != SQLITE_OK) {
     logcn("ERROR parsing SQL statement! : ", cstmt->stmnt, sql_res);
-    exit_db();
+    close_db();
     return sql_res;
   }
 
@@ -127,7 +127,7 @@ int exec_sql(STMT *cstmt) {
     logcn("ERROR SQL statement was unable to complete! : ", cstmt->stmnt,
           sql_res);
     sqlite3_finalize(crt_stmt);
-    exit_db();
+    close_db();
     return sql_res;
   }
 
@@ -149,7 +149,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
 
   if (sql_res != SQLITE_OK) {
     logcn("ERROR parsing SQL statement! : ", cstmt->stmnt, sql_res);
-    exit_db();
+    close_db();
     free(out);
     return NULL;
   }
@@ -161,7 +161,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
     logcn("ERROR SQL statement was unable to complete! : ", cstmt->stmnt,
           sql_res);
     sqlite3_finalize(crt_stmt);
-    exit_db();
+    close_db();
     free(out);
     return NULL;
   }
@@ -187,7 +187,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
         buffsize += buffsize / 2;
         lines_new = (LINE *)realloc(lines, buffsize * sizeof(LINE));
         if(lines_new == NULL){
-          logn("ERROR not enough memory! realloc failed for size of:", buffsiz * sizeof(LINE));
+          logn("ERROR not enough memory! realloc failed for size of:", buffsize * sizeof(LINE));
           free(lines);
           return NULL;
         } else {
@@ -211,7 +211,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
     // reallocate so there are no empty lines
     lines_new = (LINE *)realloc(lines, out->linecount * sizeof(LINE));
     if(lines_new == NULL){
-      logn("ERROR not enough memory! realloc failed for size of:", buffsiz * sizeof(LINE));
+      logn("ERROR not enough memory! realloc failed for size of:", buffsize * sizeof(LINE));
       free(lines);
       return NULL;
     } else {
@@ -222,7 +222,7 @@ TABLE *exec_sql_ret(STMT *cstmt) {
       logcn("ERROR while stepping through SQL statement with return values! : ",
             cstmt->stmnt, sql_res);
       sqlite3_finalize(crt_stmt);
-      exit_db();
+      close_db();
       return out;
     }
   }
@@ -335,7 +335,7 @@ char *get_tablename(char sensnr) {
 }
 
 int build_new_db(void) {
-  char *str_stmt = (char *)malloc(137, sizeof(char));
+  char *str_stmt = (char *)malloc(137 * sizeof(char));
   char sensnr;
   STMT *crt_stmt = (STMT *)malloc(sizeof(STMT));
   int sql_res;
