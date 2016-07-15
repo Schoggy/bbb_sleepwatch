@@ -187,7 +187,7 @@ void init_watch(void) {
     
     pthread_mutex_t temp1 = PTHREAD_MUTEX_INITIALIZER;
     (bufarr + cntr)->r_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-    *((bufarr + cntr)->r_mutex) = temp1;
+    *((bufarr + cntr)->r_mutex) = temp;
     response = pthread_mutex_init((bufarr + cntr)->r_mutex, NULL);
     if(!response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
@@ -196,7 +196,7 @@ void init_watch(void) {
     
     pthread_mutex_t temp2 = PTHREAD_MUTEX_INITIALIZER;
     (bufarr + cntr)->w_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-    *((bufarr + cntr)->w_mutex) = temp2;
+    *((bufarr + cntr)->w_mutex) = temp;
     response = pthread_mutex_init((bufarr + cntr)->w_mutex, NULL);
     if(!response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
@@ -209,7 +209,7 @@ void init_watch(void) {
   threads = (WTHR*) malloc(4 * sizeof(WTHR));
   for(cntr = 0; cntr < 4; cntr++){
     if(cntr == 3){ cntr++;} // as sensors 2 and 3 are actually one sensor, only one thread is needed. 
-    res = start_watch_thread((threads + cntr), cntr,
+    res = start_watch_thread((threads + cntr), cntr, 
       (unsigned int) floor(DB_LOG_INTERVAL / floor((bufarr + cntr)->bufsize * 0.79)));
     if(res){
       logn("ERROR failed to start watch thread for sensnr: ", (int) cntr);
@@ -218,7 +218,7 @@ void init_watch(void) {
   
   // start database flusher thread
   thread_db = (WTHR*) malloc(sizeof(WTHR));
-  res = start_db_thread((threads + cntr), DB_LOG_INTERVAL);
+  res = start_db_thread((threads + cntr), cntr, DB_LOG_INTERVAL);
   if(res){
     logn("ERROR failed to start watch thread for sensnr: ", (int) cntr);
   }
@@ -339,7 +339,7 @@ void advance_r_pointer(char* sensnr){
   pthread_mutex_lock(bufarr->r_mutex);
   
   // advance the pointer by 1 mod buffersize
-  (bufarr + *sensnr)->r_ptr =
+  (bufarr + sensnr)->r_ptr =
       (bufarr + *sensnr)->s_ptr +
       (((bufarr + *sensnr)->r_ptr - (bufarr + *sensnr)->s_ptr + 1) %
        (bufarr + *sensnr)->bufsize);

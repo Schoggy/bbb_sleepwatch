@@ -36,8 +36,8 @@ WTHR *thread_db;
 // ringbuffer to temporarily hold sensor data
 typedef struct data_buffer {
   int bufsize;
-  int *r_ptr;
-  int *w_ptr;
+  volatile int *r_ptr;
+  volatile int *w_ptr;
   int *s_ptr;
   pthread_mutex_t *r_mutex;
   pthread_mutex_t *w_mutex;  
