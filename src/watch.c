@@ -9,7 +9,7 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   pthread_mutex_t temp = PTHREAD_MUTEX_INITIALIZER;
   *(thread->spinlock) = temp;
   response = pthread_mutex_init(thread->spinlock, NULL);
-  if(!response){
+  if(response){
     logn("ERROR could not initialize mutex to start watch thread! Error number:", response);
     return response;
   }
@@ -30,7 +30,7 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   
   // create the thread
   response = pthread_create(&(thread->t_id), &thread_attr, (void*) &watch_thread, &thread);
-  if(!response){
+  if(response){
     logn("ERROR failed to create watch thread: ", response);
     return response;
   }
@@ -47,7 +47,7 @@ int start_db_thread(WTHR *thread, unsigned int delay_ms){
   thread->spinlock = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
   *(thread->spinlock) = temp;
   response = pthread_mutex_init(thread->spinlock, NULL);
-  if(!response){
+  if(response){
     logn("ERROR could not initialize mutex to start watch thread! Error number:", response);
     return response;
   }
@@ -61,7 +61,7 @@ int start_db_thread(WTHR *thread, unsigned int delay_ms){
   
   // create the thread
   response = pthread_create(&(thread->t_id), &thread_attr, (void*) &db_thread, &thread);
-  if(!response){
+  if(response){
     logn("ERROR failed to create db thread: ", response);
     return response;
   }
@@ -113,8 +113,8 @@ static void * watch_thread(WTHR* inf){
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(!pthread_mutex_lock(inf->spinlock)){
-      if(!inf->running){ // stop the thread
+    if(pthread_mutex_lock(inf->spinlock)){
+      if(inf->running){ // stop the thread
         pthread_mutex_unlock(inf->spinlock);
         
         // OK to call logm here, status of all threads is known, none will call log functions now
@@ -139,8 +139,8 @@ static void * db_thread(WTHR* inf){
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(!pthread_mutex_lock(inf->spinlock)){
-      if(!inf->running){ // stop the thread
+    if(pthread_mutex_lock(inf->spinlock)){
+      if(inf->running){ // stop the thread
         pthread_mutex_unlock(inf->spinlock);
         
         // OK to call logm here, status of all threads is known, none will call log functions now
@@ -189,7 +189,7 @@ void init_watch(void) {
     (bufarr + cntr)->r_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
     *((bufarr + cntr)->r_mutex) = temp1;
     response = pthread_mutex_init((bufarr + cntr)->r_mutex, NULL);
-    if(!response){
+    if(response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
       exit(1);
     }
@@ -198,7 +198,7 @@ void init_watch(void) {
     (bufarr + cntr)->w_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
     *((bufarr + cntr)->w_mutex) = temp2;
     response = pthread_mutex_init((bufarr + cntr)->w_mutex, NULL);
-    if(!response){
+    if(response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
     }
   }
