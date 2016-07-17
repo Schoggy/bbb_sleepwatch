@@ -21,10 +21,12 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   }
   
   // create the thread
-  printf("Starting thread sensnr: %i\n", sensnr);
+  printf("Starting thread sensnr: %i\n", sensnr); // debug
   response = pthread_create(&(thread->t_id), &thread_attr, &watch_thread, (void*) thread);
   if(response){
     logn("ERROR failed to create watch thread: ", response);
+  } else {
+    logn("INFO successfully started watch thread for sensnr: ", sensnr);
   }
   
   // cleanup
@@ -48,6 +50,8 @@ int start_db_thread(WTHR *thread, unsigned int delay_ms){
   response = pthread_create(&(thread->t_id), &thread_attr, &db_thread, (void*) thread);
   if(response){
     logn("ERROR failed to create db thread: ", response);
+  } else {
+    logm("INFO successfully started DB thread!");
   }
   
   // cleanup
@@ -99,7 +103,7 @@ static void * watch_thread(void *arg){
     
     // lock mutex protecting the variable "running"
     pthread_mutex_lock(&mutex);
-    if(inf->running){ // stop the thread
+    if(!inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
       
       // OK to call logm here, status of all threads is known, noone will call log functions now
@@ -125,7 +129,7 @@ static void * db_thread(void *arg){
     
     // lock mutex protecting the variable "running"
     pthread_mutex_lock(&mutex);
-    if(inf->running){ // stop the thread
+    if(!inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
       
       // OK to call logm here, status of all threads is known, noone will call log functions now
