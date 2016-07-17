@@ -10,9 +10,9 @@ int main() {
   char dbfile[7] = "testdb";
 
   init_log(logfile);
-  init_watch();
   init_db(dbfile, 0);
-  
+  init_watch();
+    
   sleep_milliseconds(50000);
 
   close_watch();

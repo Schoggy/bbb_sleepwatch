@@ -4,15 +4,7 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   int response;
   
   if(sensnr == 3){sensnr++;}
-  thread->spinlock = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-  // init spinlock and set other thread data
-  pthread_mutex_t temp = PTHREAD_MUTEX_INITIALIZER;
-  *(thread->spinlock) = temp;
-  response = pthread_mutex_init(thread->spinlock, NULL);
-  if(response){
-    logn("ERROR could not initialize mutex to start watch thread! Error number:", response);
-    return response;
-  }
+  
   thread->running = 1;
   thread->sensnr = sensnr;
   thread->delay = delay_ms;
@@ -29,28 +21,21 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   }
   
   // create the thread
+  printf("Starting thread sensnr: %i\n", sensnr);
   response = pthread_create(&(thread->t_id), &thread_attr, (void*) &watch_thread, &thread);
   if(response){
     logn("ERROR failed to create watch thread: ", response);
-    return response;
   }
   
   // cleanup
   pthread_attr_destroy(&thread_attr);
+  return response;
 }
 
 int start_db_thread(WTHR *thread, unsigned int delay_ms){
   int response;
   
-  // init spinlock and set other thread data
-  pthread_mutex_t temp = PTHREAD_MUTEX_INITIALIZER;
-  thread->spinlock = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-  *(thread->spinlock) = temp;
-  response = pthread_mutex_init(thread->spinlock, NULL);
-  if(response){
-    logn("ERROR could not initialize mutex to start watch thread! Error number:", response);
-    return response;
-  }
+  // set thread data
   thread->running = 1;
   thread->sensnr = 10;
   thread->delay = delay_ms;
@@ -63,11 +48,11 @@ int start_db_thread(WTHR *thread, unsigned int delay_ms){
   response = pthread_create(&(thread->t_id), &thread_attr, (void*) &db_thread, &thread);
   if(response){
     logn("ERROR failed to create db thread: ", response);
-    return response;
   }
   
   // cleanup
   pthread_attr_destroy(&thread_attr);
+  return response;
 }
 
 int stop_watch_thread(char sensnr){
@@ -83,8 +68,6 @@ int stop_watch_thread(char sensnr){
   ret = *((int*) t_ret);
   free(t_ret);
   
-  // cleanup mutex
-  pthread_mutex_destroy((threads + sensnr)->spinlock);
   return ret;
 }
 
@@ -101,29 +84,32 @@ int stop_db_thread(void){
   pthread_join(thread_db->t_id, &t_ret);
   ret = *((int*) t_ret);
   free(t_ret);
-  // cleanup mutex
-  pthread_mutex_destroy(thread_db->spinlock);
   return ret;
 }
 
 static void * watch_thread(WTHR* inf){
+  printf("Thread started! Sensnr: %i\n", inf->sensnr); // debug 
   int *ret = (int*) malloc(sizeof(int));
   *ret = (int) inf->sensnr;
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  inf->spinlock = &mutex;
   // main loop for the thread
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(pthread_mutex_lock(inf->spinlock)){
+    if(pthread_mutex_lock(&mutex)){
       if(inf->running){ // stop the thread
-        pthread_mutex_unlock(inf->spinlock);
+        pthread_mutex_unlock(&mutex);
         
         // OK to call logm here, status of all threads is known, none will call log functions now
-        logn("INFO thread successfully stopped. sensnr: ", (int) inf->sensnr);
+        logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
+        pthread_mutex_destroy(&mutex);
         return ret;
       }
-      pthread_mutex_unlock(inf->spinlock);
+      pthread_mutex_unlock(&mutex);
     } else {
-      fprintf(stderr, "ERROR couldn't lock mutex! Watchthread sensnr: %i\n", (int) inf->sensnr);
+      fprintf(stderr, "ERROR couldn't lock mutex! Watchthread sensnr: %i\n", inf->sensnr);
+      pthread_mutex_destroy(&mutex);
       return ret;
     }
     
@@ -136,22 +122,26 @@ static void * watch_thread(WTHR* inf){
 static void * db_thread(WTHR* inf){
   int *ret = (int*) malloc(sizeof(int));
   // main loop for the thread
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  inf->spinlock = &mutex;
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(pthread_mutex_lock(inf->spinlock)){
+    if(pthread_mutex_lock(&mutex)){
       if(inf->running){ // stop the thread
-        pthread_mutex_unlock(inf->spinlock);
+        pthread_mutex_unlock(&mutex);
         
         // OK to call logm here, status of all threads is known, none will call log functions now
         logm("INFO DB thread successfully stopped.");
         *ret = 10;
+        pthread_mutex_destroy(&mutex);
         return ret;
       }
-      pthread_mutex_unlock(inf->spinlock);
+      pthread_mutex_unlock(&mutex);
     } else {
       fprintf(stderr, "ERROR couldn't lock mutex! DB thread\n");
       *ret = 11;
+      pthread_mutex_destroy(&mutex);
       return ret;
     }
     
@@ -185,19 +175,13 @@ void init_watch(void) {
     
     (bufarr + cntr)->bufsize = bufsizes[cntr];
     
-    pthread_mutex_t temp1 = PTHREAD_MUTEX_INITIALIZER;
-    (bufarr + cntr)->r_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-    *((bufarr + cntr)->r_mutex) = temp1;
-    response = pthread_mutex_init((bufarr + cntr)->r_mutex, NULL);
+    response = pthread_mutex_init(&((bufarr + cntr)->r_mutex), NULL);
     if(response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
       exit(1);
     }
     
-    pthread_mutex_t temp2 = PTHREAD_MUTEX_INITIALIZER;
-    (bufarr + cntr)->w_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
-    *((bufarr + cntr)->w_mutex) = temp2;
-    response = pthread_mutex_init((bufarr + cntr)->w_mutex, NULL);
+    response = pthread_mutex_init(&((bufarr + cntr)->w_mutex), NULL);
     if(response){
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
     }
@@ -336,25 +320,25 @@ int grab_value(char sensnr) {
 }
 
 void advance_r_pointer(char* sensnr){
-  pthread_mutex_lock(bufarr->r_mutex);
+  pthread_mutex_lock(&((bufarr + *sensnr)->r_mutex));
   
   // advance the pointer by 1 mod buffersize
   (bufarr + *sensnr)->r_ptr =
       (bufarr + *sensnr)->s_ptr +
       (((bufarr + *sensnr)->r_ptr - (bufarr + *sensnr)->s_ptr + 1) %
        (bufarr + *sensnr)->bufsize);
-  pthread_mutex_unlock(bufarr->r_mutex);
+  pthread_mutex_unlock(&((bufarr + *sensnr)->r_mutex));
 }
 
 void advance_w_pointer(char* sensnr){
-  pthread_mutex_lock(bufarr->w_mutex);
+  pthread_mutex_lock(&((bufarr + *sensnr)->w_mutex));
   
   // advance the pointer by 1 mod buffersize
   (bufarr + *sensnr)->w_ptr =
       (bufarr + *sensnr)->s_ptr +
       (((bufarr + *sensnr)->w_ptr - (bufarr + *sensnr)->s_ptr + 1) %
        (bufarr + *sensnr)->bufsize);
-  pthread_mutex_unlock(bufarr->w_mutex);
+  pthread_mutex_unlock(&((bufarr + *sensnr)->w_mutex));
 }
 
 int buffer_empty(char* sensnr){
@@ -363,14 +347,14 @@ int buffer_empty(char* sensnr){
   int *w;
   
   // grab write pointer
-  pthread_mutex_lock((bufarr + *sensnr)->w_mutex);
+  pthread_mutex_lock(&((bufarr + *sensnr)->w_mutex));
   w = (bufarr + *sensnr)->w_ptr;
-  pthread_mutex_unlock((bufarr + *sensnr)->w_mutex);
+  pthread_mutex_unlock(&((bufarr + *sensnr)->w_mutex));
   
   // grab read pointer
-  pthread_mutex_lock((bufarr + *sensnr)->r_mutex);
+  pthread_mutex_lock(&((bufarr + *sensnr)->r_mutex));
   r = (bufarr + *sensnr)->r_ptr;
-  pthread_mutex_unlock((bufarr + *sensnr)->w_mutex);
+  pthread_mutex_unlock(&((bufarr + *sensnr)->r_mutex));
   
   // compare
   if(r == w){out = 1;}
@@ -385,8 +369,8 @@ void close_watch(void) {
     free((bufarr + cntr)->s_ptr);
     
     // cleanup the mutexes
-    pthread_mutex_destroy((bufarr + cntr)->r_mutex);
-    pthread_mutex_destroy((bufarr + cntr)->w_mutex);
+    pthread_mutex_destroy(&((bufarr + cntr)->r_mutex));
+    pthread_mutex_destroy(&((bufarr + cntr)->w_mutex));
     if(cntr < 4){
       
       // stop watch threads

@@ -39,8 +39,8 @@ typedef struct data_buffer {
   int *r_ptr;
   int *w_ptr;
   int *s_ptr;
-  pthread_mutex_t *r_mutex;
-  pthread_mutex_t *w_mutex;  
+  pthread_mutex_t r_mutex;
+  pthread_mutex_t w_mutex;  
 } BUF;
 
 BUF *bufarr;
