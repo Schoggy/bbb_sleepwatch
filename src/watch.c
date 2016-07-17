@@ -67,14 +67,11 @@ int stop_watch_thread(char sensnr){
   (threads + sensnr)->running = 0;
   pthread_mutex_unlock((threads + sensnr)->spinlock);
   printf("Running is now 0, waiting for thread to join...\n"); // debug
-  void *t_ret;
+  void **t_ret;
   
   // join with the thread
-  pthread_join((threads + sensnr)->t_id, &t_ret);
-  printf("Thread joined! Freeing return variable..\n"); // debug
-  ret = *((int*) t_ret);
-  free(t_ret);
-  printf("Done, thread successfully stopped!\n"); // debug
+  pthread_join((threads + sensnr)->t_id, t_ret);
+  printf("Done, thread successfully joined!\n"); // debug
   fflush(stdout);
   return ret;
 }
@@ -88,22 +85,17 @@ int stop_db_thread(void){
   thread_db->running = 0;
   pthread_mutex_unlock(thread_db->spinlock);
   printf("Running is now 0, waiting for thread to join...\n"); // debug
-  void *t_ret;
+  void **t_ret;
   
   // join with the thread
-  pthread_join(thread_db->t_id, &t_ret);
-  printf("Thread joined, now freeing return variable\n"); // debug
-  ret = *((int*) t_ret);
-  free(t_ret);
-  printf("Done, thread successfully stopped!\n"); // debug
+  pthread_join(thread_db->t_id, t_ret);
+  printf("Done, thread successfully joined!\n"); // debug
   return ret;
 }
 
 static void * watch_thread(void *arg){
   WTHR *inf = arg;
   printf("Thread started! Sensnr: %i\n", inf->sensnr); // debug 
-  int *ret = (int*) malloc(sizeof(int));
-  *ret = (int) inf->sensnr;
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   inf->spinlock = &mutex;
   // main loop for the thread
@@ -117,7 +109,7 @@ static void * watch_thread(void *arg){
       // OK to call logm here, status of all threads is known, noone will call log functions now
       logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
       pthread_mutex_destroy(&mutex);
-      return ret;
+      pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
     
@@ -129,7 +121,6 @@ static void * watch_thread(void *arg){
 
 static void * db_thread(void *arg){
   WTHR *inf = arg;
-  int *ret = (int*) malloc(sizeof(int));
   // main loop for the thread
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   inf->spinlock = &mutex;
@@ -142,9 +133,8 @@ static void * db_thread(void *arg){
       
       // OK to call logm here, status of all threads is known, noone will call log functions now
       logm("INFO DB thread successfully stopped.");
-      *ret = 10;
       pthread_mutex_destroy(&mutex);
-      return ret;
+      pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
     
