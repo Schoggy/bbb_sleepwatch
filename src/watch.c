@@ -66,15 +66,16 @@ int stop_watch_thread(char sensnr){
   pthread_mutex_lock((threads + sensnr)->spinlock);
   (threads + sensnr)->running = 0;
   pthread_mutex_unlock((threads + sensnr)->spinlock);
-  printf("Running is now 0, waiting for thread to join..."); // debug
+  printf("Running is now 0, waiting for thread to join...\n"); // debug
   void *t_ret;
   
   // join with the thread
   pthread_join((threads + sensnr)->t_id, &t_ret);
-  printf("Thread joined! Freeing return variable.."); // debug
+  printf("Thread joined! Freeing return variable..\n"); // debug
   ret = *((int*) t_ret);
   free(t_ret);
-  printf("Done, thread successfully stopped!");
+  printf("Done, thread successfully stopped!\n"); // debug
+  fflush(stdout);
   return ret;
 }
 
@@ -82,15 +83,19 @@ int stop_db_thread(void){
   int ret;
   
   // tell the thread to stop next time it runs through the loop
+  printf("Stopping db thread\n"); // debug
   pthread_mutex_lock(thread_db->spinlock);
   thread_db->running = 0;
   pthread_mutex_unlock(thread_db->spinlock);
+  printf("Running is now 0, waiting for thread to join...\n"); // debug
   void *t_ret;
   
   // join with the thread
   pthread_join(thread_db->t_id, &t_ret);
+  printf("Thread joined, now freeing return variable\n"); // debug
   ret = *((int*) t_ret);
   free(t_ret);
+  printf("Done, thread successfully stopped!\n"); // debug
   return ret;
 }
 
