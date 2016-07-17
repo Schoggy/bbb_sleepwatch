@@ -106,7 +106,7 @@ static void * watch_thread(void *arg){
     if(!inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
       
-      // OK to call logm here, status of all threads is known, noone will call log functions now
+      // OK to call logm here, status of all threads is known, noone will call log functions right now
       logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
       pthread_mutex_destroy(&mutex);
       pthread_exit(NULL);
@@ -121,26 +121,30 @@ static void * watch_thread(void *arg){
 
 static void * db_thread(void *arg){
   WTHR *inf = arg;
+  int dcnt;
   // main loop for the thread
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   inf->spinlock = &mutex;
   while(1){
-    
-    // lock mutex protecting the variable "running"
-    pthread_mutex_lock(&mutex);
-    if(!inf->running){ // stop the thread
+    for(dcnt = 0; dcnt < 10; dcnt++){ 
+      // this thread should have a high idle time but can only be stopped when active.
+      // therefore wake the thread 10 times during idle time to check if it should stop.
+      sleep_milliseconds(inf->delay / 10);
+      // lock mutex protecting the variable "running"
+      pthread_mutex_lock(&mutex);
+      if(!inf->running){ // stop the thread
+        pthread_mutex_unlock(&mutex);
+        pthread_mutex_destroy(&mutex);
+        // OK to call logm here, status of all threads is known, noone will call log functions right now
+        logm("INFO DB thread successfully stopped.");
+        
+        pthread_exit(NULL);
+      }
       pthread_mutex_unlock(&mutex);
-      pthread_mutex_destroy(&mutex);
-      // OK to call logm here, status of all threads is known, noone will call log functions now
-      logm("INFO DB thread successfully stopped.");
-      
-      pthread_exit(NULL);
     }
-    pthread_mutex_unlock(&mutex);
     
     // get datapoint from sensor, 
-    flush_buffer_to_db();
-    sleep_milliseconds(inf->delay);
+    flush_buffer_to_db();      
   }
 }
 
@@ -381,7 +385,8 @@ void close_watch(void) {
 
 void flush_buffer_to_db(void) {
   char cntr_o, cntr_i;
-  int akk;
+  long akk;
+  int avg;
   for (cntr_o = 0; cntr_o < 5; cntr_o++) {
     akk = 0;
     
@@ -392,8 +397,8 @@ void flush_buffer_to_db(void) {
     if(cntr_i){
     
       // store the average in the database
-      akk /= cntr_i;
-      insert_db(cntr_o, &akk);
+      avg = (int) floor(akk / cntr_i);
+      insert_db(cntr_o, &avg);
     }
   }
 }
