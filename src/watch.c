@@ -98,21 +98,16 @@ static void * watch_thread(void *arg){
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(pthread_mutex_lock(&mutex)){
-      if(inf->running){ // stop the thread
-        pthread_mutex_unlock(&mutex);
-        
-        // OK to call logm here, status of all threads is known, none will call log functions now
-        logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
-        pthread_mutex_destroy(&mutex);
-        return ret;
-      }
+    pthread_mutex_lock(&mutex);
+    if(inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
-    } else {
-      fprintf(stderr, "ERROR couldn't lock mutex! Watchthread sensnr: %i\n", inf->sensnr);
+      
+      // OK to call logm here, status of all threads is known, noone will call log functions now
+      logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
       pthread_mutex_destroy(&mutex);
       return ret;
     }
+    pthread_mutex_unlock(&mutex);
     
     // get datapoint from sensor, 
     watch_sensor(inf->sensnr);
@@ -129,23 +124,17 @@ static void * db_thread(void *arg){
   while(1){
     
     // lock mutex protecting the variable "running"
-    if(pthread_mutex_lock(&mutex)){
-      if(inf->running){ // stop the thread
-        pthread_mutex_unlock(&mutex);
-        
-        // OK to call logm here, status of all threads is known, none will call log functions now
-        logm("INFO DB thread successfully stopped.");
-        *ret = 10;
-        pthread_mutex_destroy(&mutex);
-        return ret;
-      }
+    pthread_mutex_lock(&mutex);
+    if(inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
-    } else {
-      fprintf(stderr, "ERROR couldn't lock mutex! DB thread\n");
-      *ret = 11;
+      
+      // OK to call logm here, status of all threads is known, noone will call log functions now
+      logm("INFO DB thread successfully stopped.");
+      *ret = 10;
       pthread_mutex_destroy(&mutex);
       return ret;
     }
+    pthread_mutex_unlock(&mutex);
     
     // get datapoint from sensor, 
     flush_buffer_to_db();
