@@ -130,10 +130,10 @@ static void * db_thread(void *arg){
     pthread_mutex_lock(&mutex);
     if(!inf->running){ // stop the thread
       pthread_mutex_unlock(&mutex);
-      
+      pthread_mutex_destroy(&mutex);
       // OK to call logm here, status of all threads is known, noone will call log functions now
       logm("INFO DB thread successfully stopped.");
-      pthread_mutex_destroy(&mutex);
+      
       pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
@@ -195,7 +195,7 @@ void init_watch(void) {
   
   // start database flusher thread
   thread_db = (WTHR*) malloc(sizeof(WTHR));
-  res = start_db_thread((threads + cntr), DB_LOG_INTERVAL);
+  res = start_db_thread(thread_db, DB_LOG_INTERVAL);
   if(res){
     logn("ERROR failed to start watch thread for sensnr: ", (int) cntr);
   }
