@@ -22,7 +22,7 @@ int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
   
   // create the thread
   printf("Starting thread sensnr: %i\n", sensnr);
-  response = pthread_create(&(thread->t_id), &thread_attr, (void*) &watch_thread, &thread);
+  response = pthread_create(&(thread->t_id), &thread_attr, &watch_thread, (void*) thread);
   if(response){
     logn("ERROR failed to create watch thread: ", response);
   }
@@ -45,7 +45,7 @@ int start_db_thread(WTHR *thread, unsigned int delay_ms){
   pthread_attr_init(&thread_attr);
   
   // create the thread
-  response = pthread_create(&(thread->t_id), &thread_attr, (void*) &db_thread, &thread);
+  response = pthread_create(&(thread->t_id), &thread_attr, &db_thread, (void*) thread);
   if(response){
     logn("ERROR failed to create db thread: ", response);
   }
@@ -87,7 +87,8 @@ int stop_db_thread(void){
   return ret;
 }
 
-static void * watch_thread(WTHR* inf){
+static void * watch_thread(void *arg){
+  WTHR *inf = arg;
   printf("Thread started! Sensnr: %i\n", inf->sensnr); // debug 
   int *ret = (int*) malloc(sizeof(int));
   *ret = (int) inf->sensnr;
@@ -119,7 +120,8 @@ static void * watch_thread(WTHR* inf){
   }
 }
 
-static void * db_thread(WTHR* inf){
+static void * db_thread(void *arg){
+  WTHR *inf = arg;
   int *ret = (int*) malloc(sizeof(int));
   // main loop for the thread
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;

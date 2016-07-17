@@ -64,10 +64,10 @@ int stop_watch_thread(char sensnr);
 int stop_db_thread(void);
 
 // thread function to watch a sensor
-static void * watch_thread(WTHR* inf);
+static void * watch_thread(void *arg);
 
 // thread function to periodically empty the buffers in bufarr
-static void * db_thread(WTHR* inf);
+static void * db_thread(void *arg);
 
 // grab a datapoint from the buffer
 int grab_value(char sensnr);
