@@ -49,6 +49,9 @@ int refresh_out_time(void){
   TABLE **data = (TABLE**) malloc(5 * sizeof(TABLE*));
   for(; cnt < 5; cnt++){
     data[cnt] = get_data_time(cnt);
+    if(data[cnt] == NULL){
+      logn("ERROR could not retrieve table for sensnr: ", (int) cnt);
+      return sensnr;
   }
   write_data(file, data);
   for(cnt = 0; cnt < 5; cnt++){

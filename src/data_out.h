@@ -7,6 +7,7 @@
 #include "dht/common_dht_read.h"
 #include "sqlite_db.h"
 #include "thread_funcs.h"
+#include "log.h"
 
 OTHR *thread_do;
 char *out_file;
