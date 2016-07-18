@@ -201,12 +201,8 @@ TABLE *exec_sql_ret(STMT *cstmt) {
 
       // collect data
       (lines + out->linecount - 1)->mnr = sqlite3_column_int64(crt_stmt, 0);
-      char *str_date;
-      str_date = sqlite3_column_text(crt_stmt, 1);
-      strncpy((lines + out->linecount - 1)->mtimestamp, str_date,
-              strlen(str_date));
+      strcpy((lines + out->linecount - 1)->mtimestamp, sqlite3_column_text(crt_stmt, 1));
       (lines + out->linecount - 1)->value = sqlite3_column_int(crt_stmt, 2);
-      free(str_date);
 
       // next step
       sql_res = sqlite3_step(crt_stmt);
