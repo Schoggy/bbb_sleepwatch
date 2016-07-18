@@ -3,7 +3,10 @@
 int init_db(char *file, char newdb) {
   int sql_res;
   sql_res = sqlite3_open(file, &db);
-
+  if (sqlres) {
+    logn("ERROR opening SQL database! : ", sqlres);
+    return sqlres;
+  }
   if (newdb) {
     if (build_new_db() != 0) {
       logc("ERROR building new database in file: ", file);
@@ -186,8 +189,9 @@ TABLE *exec_sql_ret(STMT *cstmt) {
       if (out->linecount > buffsize) {
         buffsize += buffsize / 2;
         lines_new = (LINE *)realloc(lines, buffsize * sizeof(LINE));
-        if(lines_new == NULL){
-          logn("ERROR not enough memory! realloc failed for size of:", buffsize * sizeof(LINE));
+        if (lines_new == NULL) {
+          logn("ERROR not enough memory! realloc failed for size of:",
+               buffsize * sizeof(LINE));
           free(lines);
           return NULL;
         } else {
@@ -210,8 +214,9 @@ TABLE *exec_sql_ret(STMT *cstmt) {
 
     // reallocate so there are no empty lines
     lines_new = (LINE *)realloc(lines, out->linecount * sizeof(LINE));
-    if(lines_new == NULL){
-      logn("ERROR not enough memory! realloc failed for size of:", buffsize * sizeof(LINE));
+    if (lines_new == NULL) {
+      logn("ERROR not enough memory! realloc failed for size of:",
+           buffsize * sizeof(LINE));
       free(lines);
       return NULL;
     } else {

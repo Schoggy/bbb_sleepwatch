@@ -66,7 +66,8 @@ int insert_db(char sensnr, int *value);
 // executes a select statement to grab values between s_time and e_time
 TABLE *query_db(char sensnr, char *s_time, char *e_time);
 
-// executes a select statement to grab the last nr of lines written to the database
+// executes a select statement to grab the last nr of lines written to the
+// database
 TABLE *tail_db(char sensnr, int nr);
 
 // releases all memory held by a TABLE variable
@@ -83,7 +84,8 @@ void destroy_stmt(STMT *cstmt);
 // executes a SQL statement without a return value
 int exec_sql(STMT *cstmt);
 
-// executes a SQL statement with a return value in the form (LONG NUMBER, VARCHAR, NUMBER);
+// executes a SQL statement with a return value in the form (LONG NUMBER,
+// VARCHAR, NUMBER);
 TABLE *exec_sql_ret(STMT *cstmt);
 
 // returns an INSERT SQL statement for sensor sensnr and value

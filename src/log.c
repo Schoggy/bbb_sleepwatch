@@ -1,8 +1,6 @@
 #include "log.h"
 
-void init_log(char* str_logfile){
-  l_logfile = str_logfile;
-}
+void init_log(char *str_logfile) { l_logfile = str_logfile; }
 
 void logm(char *message) {
   FILE *log = fopen(l_logfile, "a+");

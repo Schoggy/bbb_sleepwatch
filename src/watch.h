@@ -2,13 +2,13 @@
 #define SW_WATCH_H
 
 #include "dht/BBB/bbb_dht_read.h"
-#include "sqlite_db.h"
-#include <stdlib.h>
-#include <pthread.h>
-#include <math.h>
-#include "log.h"
 #include "dht/common_dht_read.h"
+#include "log.h"
+#include "sqlite_db.h"
 #include "thread_funcs.h"
+#include <math.h>
+#include <pthread.h>
+#include <stdlib.h>
 
 // light sensor
 #define ADC_FILE0 "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
@@ -24,8 +24,6 @@
 // intervall between database entries in milliseconds
 #define DB_LOG_INTERVAL 10000
 
-
-
 WTHR *threads;
 OTHR *thread_db;
 
@@ -36,7 +34,7 @@ typedef struct data_buffer {
   unsigned int *w_ptr;
   unsigned int *s_ptr;
   pthread_mutex_t r_mutex;
-  pthread_mutex_t w_mutex;  
+  pthread_mutex_t w_mutex;
 } BUF;
 
 BUF *bufarr;
@@ -51,10 +49,10 @@ void run_threads(void);
 void watch_sensor(char sensnr);
 
 // thread function to watch a sensor
-static void * watch_thread(void *arg);
+static void *watch_thread(void *arg);
 
 // thread function to periodically empty the buffers in bufarr
-static void * db_thread(void *arg);
+static void *db_thread(void *arg);
 
 // grab a datapoint from the buffer
 unsigned int grab_value(char sensnr);
@@ -62,18 +60,18 @@ unsigned int grab_value(char sensnr);
 // add datapoint to the buffer
 void add_to_buf(char sensnr, unsigned int *val);
 
-// read from the adc file 
+// read from the adc file
 unsigned int read_adc(char *adcfile);
 
 // read the AM2302 sensor
 int read_dht(float *hum, float *temp);
 
 // advance the pointer - thread safe
-void advance_r_pointer(char* sensnr);
-void advance_w_pointer(char* sensnr);
+void advance_r_pointer(char *sensnr);
+void advance_w_pointer(char *sensnr);
 
 // check if buffer for sensor sensnr is empty
-int buffer_empty(char* sensnr);
+int buffer_empty(char *sensnr);
 
 // read all datapoints in the buffer and store the average in the database
 void flush_buffer_to_db(void);

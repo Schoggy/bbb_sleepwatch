@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* l_logfile;
+char *l_logfile;
 
-void init_log(char* str_logfile);
+void init_log(char *str_logfile);
 
 // write string message to log
 void logm(char *message);
