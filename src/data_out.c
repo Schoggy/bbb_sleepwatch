@@ -60,15 +60,15 @@ int refresh_out_time(void){
 
 TABLE* get_data_time(char sensnr){
   TABLE *out;
-  char *str_from = (char*) calloc(32, sizeof(char));
-  char *str_to = (char*) calloc(32, sizeof(char));
+  char *str_from = (char*) calloc(38, sizeof(char));
+  char *str_to = (char*) calloc(38, sizeof(char));
   
   if(to == 0){
     strncpy(str_to, "datetime('now')", 15);
   } else {
-    snprintf(str_to, 31, "datetime('-%u minute')", to);
+    snprintf(str_to, 31, "datetime('now','-%u minute')", to);
   }
-  snprintf(str_from, 31, "datetime('-%u minute')", from);
+  snprintf(str_from, 31, "datetime('now','-%u minute')", from);
   
   out = query_db(sensnr, str_from, str_to);
   
