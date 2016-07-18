@@ -1,98 +1,5 @@
 #include "watch.h"
 
-int start_watch_thread(WTHR *thread, char sensnr, unsigned int delay_ms){
-  int response;
-  
-  if(sensnr == 3){sensnr++;}
-  
-  thread->running = 1;
-  thread->sensnr = sensnr;
-  thread->delay = delay_ms;
-  
-  // build pthread attribute valiable
-  pthread_attr_t thread_attr;
-  pthread_attr_init(&thread_attr);
-  
-  if(sensnr == 2){
-    pthread_attr_setschedpolicy(&thread_attr, SCHED_FIFO);
-    struct sched_param par;
-    par.sched_priority = 1;
-    pthread_attr_setschedparam(&thread_attr, &par);
-  }
-  
-  // create the thread
-  printf("Starting thread sensnr: %i\n", sensnr); // debug
-  response = pthread_create(&(thread->t_id), &thread_attr, &watch_thread, (void*) thread);
-  if(response){
-    logn("ERROR failed to create watch thread: ", response);
-  } else {
-    logn("INFO successfully started watch thread for sensnr: ", sensnr);
-  }
-  
-  // cleanup
-  pthread_attr_destroy(&thread_attr);
-  return response;
-}
-
-int start_db_thread(WTHR *thread, unsigned int delay_ms){
-  int response;
-  
-  // set thread data
-  thread->running = 1;
-  thread->sensnr = 10;
-  thread->delay = delay_ms;
-  
-  // build pthread attribute valiable
-  pthread_attr_t thread_attr;
-  pthread_attr_init(&thread_attr);
-  
-  // create the thread
-  response = pthread_create(&(thread->t_id), &thread_attr, &db_thread, (void*) thread);
-  if(response){
-    logn("ERROR failed to create db thread: ", response);
-  } else {
-    logm("INFO successfully started DB thread!");
-  }
-  
-  // cleanup
-  pthread_attr_destroy(&thread_attr);
-  return response;
-}
-
-int stop_watch_thread(char sensnr){
-  int ret;
-  // tell the thread to stop next time it runs through the loop
-  printf("Stopping watch thread sensnr: %i\n", sensnr); // debug
-  pthread_mutex_lock((threads + sensnr)->spinlock);
-  (threads + sensnr)->running = 0;
-  pthread_mutex_unlock((threads + sensnr)->spinlock);
-  printf("Running is now 0, waiting for thread to join...\n"); // debug
-  void **t_ret;
-  
-  // join with the thread
-  pthread_join((threads + sensnr)->t_id, t_ret);
-  printf("Done, thread successfully joined!\n"); // debug
-  fflush(stdout);
-  return ret;
-}
-
-int stop_db_thread(void){
-  int ret;
-  
-  // tell the thread to stop next time it runs through the loop
-  printf("Stopping db thread\n"); // debug
-  pthread_mutex_lock(thread_db->spinlock);
-  thread_db->running = 0;
-  pthread_mutex_unlock(thread_db->spinlock);
-  printf("Running is now 0, waiting for thread to join...\n"); // debug
-  void **t_ret;
-  
-  // join with the thread
-  pthread_join(thread_db->t_id, t_ret);
-  printf("Done, thread successfully joined!\n"); // debug
-  return ret;
-}
-
 static void * watch_thread(void *arg){
   WTHR *inf = arg;
   printf("Thread started! Sensnr: %i\n", inf->sensnr); // debug 
@@ -120,7 +27,7 @@ static void * watch_thread(void *arg){
 }
 
 static void * db_thread(void *arg){
-  WTHR *inf = arg;
+  OTHR *inf = arg;
   int dcnt;
   // main loop for the thread
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -148,7 +55,7 @@ static void * db_thread(void *arg){
   }
 }
 
-void init_watch(void) {
+void init_watch(char en_monitoring) {
   
   // init adc
   FILE* test = fopen(ADC_FILE0, "r");
@@ -166,7 +73,7 @@ void init_watch(void) {
   for (; cntr < 5; cntr++) {
     
     // get memory for the buffer
-    (bufarr + cntr)->s_ptr = (int *)malloc(bufsizes[cntr] * sizeof(int));
+    (bufarr + cntr)->s_ptr = (unsigned int *)malloc(bufsizes[cntr] * sizeof(unsigned int));
     (bufarr + cntr)->r_ptr = (bufarr + cntr)->s_ptr;
     (bufarr + cntr)->w_ptr = (bufarr + cntr)->s_ptr;
     
@@ -183,30 +90,37 @@ void init_watch(void) {
       logn("ERROR could not initialize mutex for bufarr! Error number:", response);
     }
   }
-  
+  if(en_monitoring){
+    run_threads();
+  }
+}
+
+void run_threads(void){
   // start watch threads 
+  char cntr = 0;
   int res;
-  unsigned int delay_ms;
   threads = (WTHR*) malloc(4 * sizeof(WTHR));
   for(cntr = 0; cntr < 4; cntr++){
     if(cntr == 3){ cntr++;} // as sensors 2 and 3 are actually one sensor, only one thread is needed. 
     res = start_watch_thread((threads + cntr), cntr,
-      (unsigned int) floor(DB_LOG_INTERVAL / floor((bufarr + cntr)->bufsize * 0.79)));
+      (unsigned int) floor(DB_LOG_INTERVAL / floor((bufarr + cntr)->bufsize * 0.79)), &watch_thread);
     if(res){
       logn("ERROR failed to start watch thread for sensnr: ", (int) cntr);
+    } else {
+      logn("INFO successfully started watch thread for sensnr: ", (int) cntr);
     }
   }
   
   // start database flusher thread
-  thread_db = (WTHR*) malloc(sizeof(WTHR));
-  res = start_db_thread(thread_db, DB_LOG_INTERVAL);
+  thread_db = (OTHR*) malloc(sizeof(OTHR));
+  res = start_other_thread(thread_db, DB_LOG_INTERVAL, &db_thread);
   if(res){
     logn("ERROR failed to start watch thread for sensnr: ", (int) cntr);
   }
 }
 
 void watch_sensor(char sensnr) {
-  int val;
+  unsigned int val;
   switch (sensnr) {
   case 0: {
     // light level
@@ -232,9 +146,9 @@ void watch_sensor(char sensnr) {
     float hum, temp;
     int dht_res = read_dht(&hum, &temp);
     if (dht_res == DHT_SUCCESS) {
-      val = temp * 100;
+      val = (unsigned int) (temp * 100);
       add_to_buf(TSENS, &val);
-      val = hum * 100;
+      val = (unsigned int) (hum * 100);
       add_to_buf(HSENS, &val);
     }
   } break;
@@ -253,7 +167,7 @@ void watch_sensor(char sensnr) {
   }
 }
 
-int read_adc(char *adcfile) {
+unsigned int read_adc(char *adcfile) {
   FILE *file = fopen(adcfile, "r");
 
   if (file == NULL) {
@@ -262,15 +176,15 @@ int read_adc(char *adcfile) {
   }
   
   char *cval = (char *)calloc(5, sizeof(char));
-  int out;
+  unsigned long out;
 
   fread(cval, 1, 4, file);
-  out = atoi(cval);
+  out = strtoul(cval, NULL, 0);
   
   free(cval);
   fclose(file);
   
-  return out;
+  return (unsigned int) out;
 }
 
 int read_dht(float *hum, float *temp) {
@@ -305,13 +219,13 @@ int read_dht(float *hum, float *temp) {
   return dht_res;
 }
 
-void add_to_buf(char sensnr, int *val) {
+void add_to_buf(char sensnr, unsigned int *val) {
   *((bufarr + sensnr)->w_ptr) = *val;
   advance_w_pointer(&sensnr);
 }
 
-int grab_value(char sensnr) {
-  int out = *((bufarr + sensnr)->r_ptr);
+unsigned int grab_value(char sensnr) {
+  unsigned int out = *((bufarr + sensnr)->r_ptr);
   advance_r_pointer(&sensnr);
   return out;
 }
@@ -340,8 +254,8 @@ void advance_w_pointer(char* sensnr){
 
 int buffer_empty(char* sensnr){
   int out = 0;
-  int *r;
-  int *w;
+  unsigned int *r;
+  unsigned int *w;
   
   // grab write pointer
   pthread_mutex_lock(&((bufarr + *sensnr)->w_mutex));
@@ -371,11 +285,11 @@ void close_watch(void) {
     if(cntr < 4){
       
       // stop watch threads
-      stop_watch_thread(cntr);
+      stop_watch_thread(threads + cntr);
     }
   }
   
-  stop_db_thread();
+  stop_other_thread(thread_db);
   
   // free buffer and thread info structs
   free(bufarr);
@@ -385,19 +299,20 @@ void close_watch(void) {
 
 void flush_buffer_to_db(void) {
   char cntr_o, cntr_i;
-  long akk;
+  unsigned long akk;
   int avg;
   for (cntr_o = 0; cntr_o < 5; cntr_o++) {
     akk = 0;
     
     // add up all datapoints in the buffer
     for (cntr_i = 0; !buffer_empty(&cntr_o); cntr_i++) {
-      akk += grab_value(cntr_o);
+      akk += (unsigned long) grab_value(cntr_o);
     }
     if(cntr_i){
-    
       // store the average in the database
       avg = (int) floor(akk / cntr_i);
+      if(cntr_o < 2){ avg = 4096 - avg;}
+      if(avg < 1){ avg = 0;}
       insert_db(cntr_o, &avg);
     }
   }

@@ -5,10 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-char logfile[16];
+char* l_logfile;
 
-// check if str_logfile is writable, create it if necessary
-int init_log(char *str_logfile);
+void init_log(char* str_logfile);
 
 // write string message to log
 void logm(char *message);

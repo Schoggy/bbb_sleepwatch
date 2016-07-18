@@ -1,21 +1,11 @@
 #include "log.h"
 
-int init_log(char *str_logfile) {
-  FILE *test;
-  test = fopen(str_logfile, "a+");
-  if (test == NULL) {
-    fprintf(stderr, "ERROR opening logfile failed!");
-    return 1;
-  } else {
-    strncpy(logfile, str_logfile, strlen(str_logfile));
-    fclose(test);
-    logm("INFO logging initiated!");
-  }
-  return 0;
+void init_log(char* str_logfile){
+  l_logfile = str_logfile;
 }
 
 void logm(char *message) {
-  FILE *log = fopen(logfile, "a");
+  FILE *log = fopen(l_logfile, "a+");
   if (log != NULL) {
     fwrite(message, sizeof(char), strlen(message), log);
     fputc('\n', log);
