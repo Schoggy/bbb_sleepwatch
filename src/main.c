@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
   char running = 1;
   int cnt = 0;
   char cin;
-  printf("Running... Press 'Q' to stop!");
+  printf("Running... Press 'Q' to stop!\n");
   while (running) {
     while (!feof(stdin)) {
       cin = getc(stdin);

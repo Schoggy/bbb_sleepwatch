@@ -3,9 +3,9 @@
 int init_db(char *file, char newdb) {
   int sql_res;
   sql_res = sqlite3_open(file, &db);
-  if (sqlres) {
-    logn("ERROR opening SQL database! : ", sqlres);
-    return sqlres;
+  if (sql_res) {
+    logn("ERROR opening SQL database! : ", sql_res);
+    return sql_res;
   }
   if (newdb) {
     if (build_new_db() != 0) {
