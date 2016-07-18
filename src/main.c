@@ -117,40 +117,37 @@ int main(int argc, char* argv[]) {
   if(output == NULL){
     output = (char*) calloc(strlen(DEFAULT_OUTPUT) + 1, sizeof(char));
     strncpy(output, DEFAULT_OUTPUT, strlen(DEFAULT_OUTPUT));
-  } else {
-    if(test_path(output) == 1){
-      printf("ERROR! Path for output file not valid or insufficient permissions!");
-      cleanup();
-      return 1;
-    }
+  }
+  if(test_path(output) == 1){
+    printf("ERROR! Path for output file not valid or insufficient permissions!");
+    cleanup();
+    return 1;
   }
   
   // database file
   if(dbfile == NULL){
     dbfile = (char*) calloc(strlen(DEFAULT_DB) + 1, sizeof(char));
     strncpy(dbfile, DEFAULT_DB, strlen(DEFAULT_DB));
-  } else {
-    int ret = test_path(dbfile);
-    if(ret == 1){
-      printf("ERROR! Path for database file not valid or insufficient permissions!");
-      cleanup();
-      return 1;
-    }
-    if(ret == 2){
-      new_dbfile = 1;
-    }
+  }
+  int ret = test_path(dbfile);
+  if(ret == 1){
+    printf("ERROR! Path for database file not valid or insufficient permissions!");
+    cleanup();
+    return 1;
+  }
+  if(ret == 2){
+    new_dbfile = 1;
   }
   
   // log file
   if(logfile == NULL){
     logfile = (char*) calloc(strlen(DEFAULT_LOG) + 1, sizeof(char));
     strncpy(logfile, DEFAULT_LOG, strlen(DEFAULT_LOG));
-  } else {
-    if(test_path(logfile) == 1){
-      printf("ERROR! Path for log file not valid or insufficient permissions!");
-      cleanup();
-      return 1;
-    }
+  }
+  if(test_path(logfile) == 1){
+    printf("ERROR! Path for log file not valid or insufficient permissions!");
+    cleanup();
+    return 1;
   }
   
   // set output fimeframe default
