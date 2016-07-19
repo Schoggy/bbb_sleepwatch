@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stropts.h>
+#include <pthread.h>
+#include "thread_funcs.h"
 
 // default number timeframe of data to output
 #define DEFAULT_OUTPUT_MINS 60
@@ -21,6 +24,7 @@
 void print_usage(void);
 int test_path(char *fpath);
 void cleanup(void);
+static void * check_q(void* args);
 
 char *dbfile;
 char *logfile;
@@ -172,7 +176,7 @@ int main(int argc, char *argv[]) {
   unsigned int from = (unsigned int)(past + output_mins);
 
   // initialize the modules
-  printf("Initializing..");
+  printf("Initializing...\n");
   init_log(logfile);
   if (new_dbfile) {
     remove(dbfile);
@@ -185,27 +189,51 @@ int main(int argc, char *argv[]) {
   char running = 1;
   int cnt = 0;
   char cin;
-  printf("Running... Press 'Q' to stop!\n");
+  OTHR *thread = (OTHR*) malloc(sizeof(OTHR));
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  thread->spinlock = &mutex;
+  start_other_thread(thread, 0, &check_q);
+  printf("Running... Press 'Q'-Enter to stop!\n");
   while (running) {
-    while (!feof(stdin)) {
-      cin = getc(stdin);
-      if (cin == 'q' || cin == 'Q') {
-        running = 0;
-      }
-    }
-    sleep_milliseconds(100);
+    pthread_mutex_lock(thread->spinlock);
+    running = thread->running;
+    pthread_mutex_unlock(thread->spinlock);
+    printf("Sleeping...\n"); // debug
+    sleep_milliseconds(1000);
     cnt = (cnt + 1) % (out_delay * 10);
 
     if (!timeout) {
       timeout--;
       if (!timeout) {
+        pthread_cancel(thread->t_id);
         running = 0;
       }
     }
   }
-
+  free(thread);
+  pthread_mutex_destroy(&mutex);
   cleanup();
   return 0;
+}
+
+static void * check_q(void *args){
+  OTHR *inf = args;
+  char cin;
+  int old_cancel;
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old_cancel);
+  while(1){
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel);
+    cin = getchar();
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old_cancel);
+    printf("Buffer not empty! Reading...\n");  // debug
+    if (cin == 'q' || cin == 'Q') {
+        printf("Q or q detected! Stopping...\n"); // debug
+        pthread_mutex_lock(inf->spinlock);
+        inf->running = 0;
+        pthread_mutex_unlock(inf->spinlock);
+        pthread_exit(NULL);
+      }
+  } 
 }
 
 int test_path(char *fpath) {
@@ -245,7 +273,8 @@ void cleanup(void) {
   free(output);
   free(logfile);
   free(dbfile);
+  
+  close_out();
   close_watch();
   close_db();
-  close_out();
 }

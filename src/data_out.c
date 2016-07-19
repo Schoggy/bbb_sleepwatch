@@ -100,6 +100,7 @@ void write_data(FILE *file, TABLE **data) {
       strncat(out_buf, num_buf, strlen(num_buf));
     }
     fwrite(out_buf, sizeof(char), strlen(out_buf), file);
+    fwrite("\n", sizeof(char), 1, file);
   }
   free(out_buf);
   free(num_buf);
