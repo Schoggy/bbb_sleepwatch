@@ -1,12 +1,14 @@
 #include "data_out.h"
 
 void init_out(char *file, unsigned int out_delay, unsigned int *i_from,
-              unsigned int *i_to) {
+              unsigned int *i_to, char read_only) {
   out_file = file;
   from = *i_from;
   to = *i_to;
-  thread_do = (OTHR *)malloc(sizeof(OTHR));
-  start_other_thread(thread_do, out_delay, &data_out_thread);
+  if(!read_only){
+    thread_do = (OTHR *)malloc(sizeof(OTHR));
+    start_other_thread(thread_do, out_delay, &data_out_thread);
+  }
 }
 
 static void *data_out_thread(void *arg) {

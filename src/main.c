@@ -192,39 +192,43 @@ int main(int argc, char *argv[]) {
   }
   init_db(dbfile, new_dbfile);
   init_watch(!read_only);
-  init_out(output, out_delay, &from, &to);
+  init_out(output, out_delay, &from, &to, read_only);
+  
+  if(!read_only){
+    char running = 1;
+    int cnt = 0;
+    char cin;
 
-  char running = 1;
-  int cnt = 0;
-  char cin;
+    // start thread to check for user input
+    OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    thread->spinlock = &mutex;
+    start_other_thread(thread, 0, &check_q);
+    
+    // main loop
+    printf("Running... Press 'Q'-Enter to stop!\n");
+    while (running) {
+      pthread_mutex_lock(thread->spinlock);
+      running = thread->running;
+      pthread_mutex_unlock(thread->spinlock);
+      printf("Sleeping...\n"); // debug
+      sleep_milliseconds(1000);
+      cnt = (cnt + 1) % (out_delay * 10);
 
-  // start thread to check for user input
-  OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
-  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-  thread->spinlock = &mutex;
-  start_other_thread(thread, 0, &check_q);
-
-  // main loop
-  printf("Running... Press 'Q'-Enter to stop!\n");
-  while (running) {
-    pthread_mutex_lock(thread->spinlock);
-    running = thread->running;
-    pthread_mutex_unlock(thread->spinlock);
-    printf("Sleeping...\n"); // debug
-    sleep_milliseconds(1000);
-    cnt = (cnt + 1) % (out_delay * 10);
-
-    if (!timeout) {
-      timeout--;
       if (!timeout) {
-        pthread_cancel(thread->t_id);
-        running = 0;
+        timeout--;
+        if (!timeout) {
+          pthread_cancel(thread->t_id);
+          running = 0;
+        }
       }
     }
+    printf("freeing qthread\n");
+    free(thread);
+    pthread_mutex_destroy(&mutex);
+  } else {
+    refresh_out_time();
   }
-  printf("freeing qthread\n");
-  free(thread);
-  pthread_mutex_destroy(&mutex);
   cleanup();
   return 0;
 }

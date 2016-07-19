@@ -15,7 +15,7 @@ unsigned int from, to;
 
 // start the output thread
 void init_out(char *file, unsigned int out_delay, unsigned int *from,
-              unsigned int *to);
+              unsigned int *to, char read_only);
 // set different timeframe to output
 void set_timeframe(unsigned int *from, unsigned int *to);
 
