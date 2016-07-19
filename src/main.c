@@ -211,12 +211,11 @@ int main(int argc, char *argv[]) {
       pthread_mutex_lock(thread->spinlock);
       running = thread->running;
       pthread_mutex_unlock(thread->spinlock);
-      sleep_milliseconds(1000);
-      cnt = (cnt + 1) % (out_delay * 10);
+      sleep_milliseconds(100);
 
-      if (!timeout) {
+      if (timeout < 0) {
         timeout--;
-        if (!timeout) {
+        if (timeout == 0) {
           pthread_cancel(thread->t_id);
           running = 0;
         }
