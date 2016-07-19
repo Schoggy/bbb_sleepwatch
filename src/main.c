@@ -196,8 +196,6 @@ int main(int argc, char *argv[]) {
   printf("Running... ");
   if(!read_only){
     char running = 1;
-    int cnt = 0;
-    char cin;
 
     // start thread to check for user input
     OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
@@ -213,7 +211,7 @@ int main(int argc, char *argv[]) {
       pthread_mutex_unlock(thread->spinlock);
       sleep_milliseconds(100);
 
-      if (timeout < 0) {
+      if (timeout > 0) {
         timeout--;
         if (timeout == 0) {
           pthread_cancel(thread->t_id);

@@ -59,6 +59,8 @@ int refresh_out_time(void) {
     data[cnt] = get_data_time(cnt);
     if (data[cnt] == NULL) { // if no data retrieved
       logn("ERROR could not retrieve table for sensnr: ", (int)cnt);
+      fclose(file);
+      free(data);
       return cnt;
     }
   }
@@ -73,6 +75,7 @@ int refresh_out_time(void) {
   // more cleanup
   free(data);
   fclose(file);
+  return 0;
 }
 
 TABLE *get_data_time(char sensnr) {
