@@ -96,8 +96,12 @@ void write_data(FILE *file, TABLE **data) {
     strncpy(out_buf, data[0]->lines[0].mtimestamp, 20);
     for (cnt_sens = 0; cnt_sens < 5; cnt_sens++) {
       memset(num_buf, '\0', 12);
-      snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
-      strncat(out_buf, num_buf, strlen(num_buf));
+      if(data[cnt_sens] != NULL){
+        if(data[cnt_sens]->lines != NULL){
+          snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
+          strncat(out_buf, num_buf, strlen(num_buf));
+        }
+      }
     }
     fwrite(out_buf, sizeof(char), strlen(out_buf), file);
     fwrite("\n", sizeof(char), 1, file);
