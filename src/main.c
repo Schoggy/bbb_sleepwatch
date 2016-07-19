@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
   init_db(dbfile, new_dbfile);
   init_watch(!read_only);
   init_out(output, out_delay, &from, &to, read_only);
-  
+  printf("Running... ");
   if(!read_only){
     char running = 1;
     int cnt = 0;
@@ -206,12 +206,11 @@ int main(int argc, char *argv[]) {
     start_other_thread(thread, 0, &check_q);
     
     // main loop
-    printf("Running... Press 'Q'-Enter to stop!\n");
+    printf("Press 'Q'-Enter to stop!\n");
     while (running) {
       pthread_mutex_lock(thread->spinlock);
       running = thread->running;
       pthread_mutex_unlock(thread->spinlock);
-      printf("Sleeping...\n"); // debug
       sleep_milliseconds(1000);
       cnt = (cnt + 1) % (out_delay * 10);
 
@@ -223,10 +222,10 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    printf("freeing qthread\n");
     free(thread);
     pthread_mutex_destroy(&mutex);
   } else {
+    printf("\n");
     refresh_out_time();
   }
   cleanup();
@@ -242,9 +241,8 @@ static void *check_q(void *args) {
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel);
     cin = getchar();
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old_cancel);
-    printf("Buffer not empty! Reading...\n"); // debug
     if (cin == 'q' || cin == 'Q') {
-      printf("Q or q detected! Stopping...\n"); // debug
+      printf("Stopping...\n");
       pthread_mutex_lock(inf->spinlock);
       inf->running = 0;
       pthread_mutex_unlock(inf->spinlock);
@@ -287,12 +285,10 @@ void print_usage(void) {
 }
 
 void cleanup(void) {
-  printf("stopping out\n");
   close_out();
-  printf("stopping watch\n");
   close_watch();
-  printf("stopping db\n");
   close_db();
+  printf("Done! Wrote data to %s.\n", output);
   free(output);
   free(logfile);
   free(dbfile);

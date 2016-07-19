@@ -2,7 +2,6 @@
 
 static void *watch_thread(void *arg) {
   WTHR *inf = arg;
-  printf("Thread started! Sensnr: %i\n", inf->sensnr); // debug
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   inf->spinlock = &mutex;
   // main loop for the thread
@@ -13,7 +12,6 @@ static void *watch_thread(void *arg) {
     if (!inf->running) { // stop the thread
       pthread_mutex_unlock(&mutex);
       pthread_mutex_destroy(&mutex);
-      printf("watch thread sensnr %i stopping\n", inf->sensnr); // debug
       pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
@@ -42,7 +40,6 @@ static void *db_thread(void *arg) {
       if (!inf->running) { // stop the thread
         pthread_mutex_unlock(&mutex);
         pthread_mutex_destroy(&mutex);
-        printf("db thread stopping\n"); // debug
         pthread_exit(NULL);
       }
       pthread_mutex_unlock(&mutex);

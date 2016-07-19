@@ -48,12 +48,12 @@ X = done, F = relatively tested - kind of stable code, B = testing/debugging, ->
  - X  database design
  - F  interface for the database
  - F  reading & buffering data from the sensors
- - B  "scheduler" and threads
- - B  module to analyze the data
+ - F  "scheduler" and threads
+ - F  module to analyze the data
  - B  main function
  - -> create style for the website
  - -  web interface
- - -  lots of testing & debugging
+ - -> lots of testing & debugging
  - +  alarm module
  - +  display
  - +  wifi module
