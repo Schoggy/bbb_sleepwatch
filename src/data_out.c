@@ -128,7 +128,11 @@ void write_data(FILE *file, TABLE **data) {
         if (data[cnt_sens]->lines != NULL) {
 
           // convert the datapoint to a string
-          snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
+          if(data[cnt_sens]->linecount >= cnt){
+            snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
+          } else {
+            strncpy(num_buf, ",-", 2);
+          }
         } else {
 
           // add a '-' if no value present

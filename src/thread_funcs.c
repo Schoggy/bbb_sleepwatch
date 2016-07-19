@@ -59,10 +59,10 @@ int stop_watch_thread(WTHR *thread) {
   thread->running = 0;
   pthread_mutex_unlock(thread->spinlock);
 
-  void **t_ret;
+  void *t_ret;
 
   // join with the thread
-  return pthread_join(thread->t_id, t_ret);
+  return pthread_join(thread->t_id, &t_ret);
 }
 
 int stop_other_thread(OTHR *thread) {
@@ -72,8 +72,8 @@ int stop_other_thread(OTHR *thread) {
   thread->running = 0;
   pthread_mutex_unlock(thread->spinlock);
 
-  void **t_ret;
+  void *t_ret;
 
   // join with the thread
-  return pthread_join(thread->t_id, t_ret);
+  return pthread_join(thread->t_id, &t_ret);
 }

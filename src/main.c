@@ -214,6 +214,7 @@ int main(int argc, char *argv[]) {
       if (timeout > 0) {
         timeout--;
         if (timeout == 0) {
+          printf("Timeout! Stopping...\n");
           pthread_cancel(thread->t_id);
           running = 0;
         }
