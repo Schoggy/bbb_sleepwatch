@@ -13,8 +13,7 @@ static void *watch_thread(void *arg) {
     if (!inf->running) { // stop the thread
       pthread_mutex_unlock(&mutex);
       pthread_mutex_destroy(&mutex);
-      printf("watch thread sensnr %i stopping\n", inf->sensnr);
-      fflush(stdin);
+      printf("watch thread sensnr %i stopping\n", inf->sensnr); // debug
       pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
@@ -43,24 +42,25 @@ static void *db_thread(void *arg) {
       if (!inf->running) { // stop the thread
         pthread_mutex_unlock(&mutex);
         pthread_mutex_destroy(&mutex);
-        printf("db thread stopping\n");
+        printf("db thread stopping\n"); // debug
         pthread_exit(NULL);
       }
       pthread_mutex_unlock(&mutex);
     }
 
-    // get datapoint from sensor,
+    // write averages to db
     flush_buffer_to_db();
   }
 }
 
 void init_watch(char en_monitoring) {
 
-  // init adc
-  FILE *test = fopen(ADC_FILE0, "r");
+  FILE *test = fopen(ADC_FILE0, "r"); // check if adc file can be opened
   if (test == NULL) {
+    // if not init adc
     system("echo BB-ADC > /sys/devices/platform/bone_capemgr/slots");
   } else {
+    // if yes close the file again
     fclose(test);
   }
 
@@ -76,20 +76,20 @@ void init_watch(char en_monitoring) {
         (unsigned int *)malloc(bufsizes[cntr] * sizeof(unsigned int));
     (bufarr + cntr)->r_ptr = (bufarr + cntr)->s_ptr;
     (bufarr + cntr)->w_ptr = (bufarr + cntr)->s_ptr;
-
     (bufarr + cntr)->bufsize = bufsizes[cntr];
 
+    // initialize the mutexes
     response = pthread_mutex_init(&((bufarr + cntr)->r_mutex), NULL);
     if (response) {
       logn("ERROR could not initialize mutex for bufarr! Error number:",
            response);
       exit(1);
     }
-
     response = pthread_mutex_init(&((bufarr + cntr)->w_mutex), NULL);
     if (response) {
       logn("ERROR could not initialize mutex for bufarr! Error number:",
            response);
+      exit(1);
     }
   }
   if (en_monitoring) {
@@ -106,6 +106,7 @@ void run_threads(void) {
     if (cntr == 3) {
       sensnr = 4;
     } // as sensors 2 and 3 are actually one sensor, only one thread is needed.
+      // Move to sensor 4 for thread 3
     res = start_watch_thread(
         (threads + cntr), cntr,
         (unsigned int)floor(DB_LOG_INTERVAL /
@@ -175,28 +176,31 @@ void watch_sensor(char sensnr) {
 }
 
 unsigned int read_adc(char *adcfile) {
-  FILE *file = fopen(adcfile, "r");
+  FILE *file = fopen(adcfile, "r"); // open adc file
 
-  if (file == NULL) {
+  if (file == NULL) { // file not opened
     logc("ERROR opening ADC file failed! : ", adcfile);
     return -1;
   }
 
   char *cval = (char *)calloc(5, sizeof(char));
   unsigned long out;
-
+  // read four characters from the file;
   fread(cval, 1, 4, file);
-  out = strtoul(cval, NULL, 0);
+  out = strtoul(cval, NULL, 0); // convert them to unsigned long
 
+  // cleanup
   free(cval);
   fclose(file);
 
-  return (unsigned int)out;
+  return (unsigned int)out; // return as unsigned int. Values from the adc
+                            // should only range from 0 to 4096
 }
 
 int read_dht(float *hum, float *temp) {
+  // read from the AM2302
   int dht_res = bbb_dht_read(AM2302, DHT_GPIO_BASE, DHT_GPIO_NR, hum, temp);
-  if (dht_res != DHT_SUCCESS) {
+  if (dht_res != DHT_SUCCESS) { // print appropriate error message
     switch (dht_res) {
     case DHT_ERROR_TIMEOUT: {
       logn("WARNING DHT did not return in give timeframe: DHT_ERROR_TIMEOUT!",

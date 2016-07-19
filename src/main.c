@@ -2,13 +2,13 @@
 #include "dht/common_dht_read.h"
 #include "log.h"
 #include "sqlite_db.h"
+#include "thread_funcs.h"
 #include "watch.h"
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stropts.h>
-#include <pthread.h>
-#include "thread_funcs.h"
 
 // default number timeframe of data to output
 #define DEFAULT_OUTPUT_MINS 60
@@ -24,7 +24,7 @@
 void print_usage(void);
 int test_path(char *fpath);
 void cleanup(void);
-static void * check_q(void* args);
+static void *check_q(void *args);
 
 char *dbfile;
 char *logfile;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   unsigned long out_delay = 0;
 
   char cntr;
-  for (cntr = 1; cntr < argc - 1; cntr++) {
+  for (cntr = 1; cntr < argc; cntr++) {
     if (argv[cntr][0] == '-') {
       switch (argv[cntr][1]) {
       case 'd': {
@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
           strncpy(dbfile, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'f': {
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
           strncpy(output, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'n': {
@@ -70,6 +72,7 @@ int main(int argc, char *argv[]) {
           strncpy(logfile, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'o': {
@@ -77,6 +80,7 @@ int main(int argc, char *argv[]) {
           output_mins = strtoul(&argv[cntr][3], NULL, 0);
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'p': {
@@ -84,6 +88,7 @@ int main(int argc, char *argv[]) {
           past = strtoul(&argv[cntr][3], NULL, 0);
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'r': {
@@ -97,6 +102,7 @@ int main(int argc, char *argv[]) {
                  timeout);
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       case 'w': {
@@ -104,16 +110,19 @@ int main(int argc, char *argv[]) {
           out_delay = strtoul(&argv[cntr][3], NULL, 0);
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
+          return 1;
         }
       } break;
       default: {
         printf("Unknown option: %c !\n", argv[cntr][1]);
         print_usage();
+        return 1;
       } break;
       }
     } else {
       printf("Unknown argument: %s !\n", argv[cntr]);
       print_usage();
+      return 1;
     }
   }
 
@@ -185,14 +194,17 @@ int main(int argc, char *argv[]) {
   init_watch(!read_only);
   init_out(output, out_delay, &from, &to);
 
-  // main loop
   char running = 1;
   int cnt = 0;
   char cin;
-  OTHR *thread = (OTHR*) malloc(sizeof(OTHR));
+
+  // start thread to check for user input
+  OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   thread->spinlock = &mutex;
   start_other_thread(thread, 0, &check_q);
+
+  // main loop
   printf("Running... Press 'Q'-Enter to stop!\n");
   while (running) {
     pthread_mutex_lock(thread->spinlock);
@@ -217,24 +229,24 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-static void * check_q(void *args){
+static void *check_q(void *args) {
   OTHR *inf = args;
   char cin;
   int old_cancel;
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old_cancel);
-  while(1){
+  while (1) {
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel);
     cin = getchar();
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old_cancel);
-    printf("Buffer not empty! Reading...\n");  // debug
+    printf("Buffer not empty! Reading...\n"); // debug
     if (cin == 'q' || cin == 'Q') {
-        printf("Q or q detected! Stopping...\n"); // debug
-        pthread_mutex_lock(inf->spinlock);
-        inf->running = 0;
-        pthread_mutex_unlock(inf->spinlock);
-        pthread_exit(NULL);
-      }
-  } 
+      printf("Q or q detected! Stopping...\n"); // debug
+      pthread_mutex_lock(inf->spinlock);
+      inf->running = 0;
+      pthread_mutex_unlock(inf->spinlock);
+      pthread_exit(NULL);
+    }
+  }
 }
 
 int test_path(char *fpath) {
@@ -271,13 +283,13 @@ void print_usage(void) {
 }
 
 void cleanup(void) {
-  free(output);
-  free(logfile);
-  free(dbfile);
-  printf("stopping out\n");  
+  printf("stopping out\n");
   close_out();
   printf("stopping watch\n");
   close_watch();
   printf("stopping db\n");
   close_db();
+  free(output);
+  free(logfile);
+  free(dbfile);
 }
