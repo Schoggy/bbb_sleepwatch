@@ -12,11 +12,9 @@ static void *watch_thread(void *arg) {
     pthread_mutex_lock(&mutex);
     if (!inf->running) { // stop the thread
       pthread_mutex_unlock(&mutex);
-
-      // OK to call logm here, status of all threads is known, noone will call
-      // log functions right now
-      logn("INFO thread successfully stopped. sensnr: ", inf->sensnr);
       pthread_mutex_destroy(&mutex);
+      printf("watch thread sensnr %i stopping\n", inf->sensnr);
+      fflush(stdin);
       pthread_exit(NULL);
     }
     pthread_mutex_unlock(&mutex);
@@ -45,10 +43,7 @@ static void *db_thread(void *arg) {
       if (!inf->running) { // stop the thread
         pthread_mutex_unlock(&mutex);
         pthread_mutex_destroy(&mutex);
-        // OK to call logm here, status of all threads is known, noone will call
-        // log functions right now
-        logm("INFO DB thread successfully stopped.");
-
+        printf("db thread stopping\n");
         pthread_exit(NULL);
       }
       pthread_mutex_unlock(&mutex);
@@ -104,12 +99,12 @@ void init_watch(char en_monitoring) {
 
 void run_threads(void) {
   // start watch threads
-  char cntr = 0;
+  char cntr = 0, sensnr = 0;
   int res;
   threads = (WTHR *)malloc(4 * sizeof(WTHR));
-  for (cntr = 0; cntr < 4; cntr++) {
+  for (; cntr < 4; cntr++, sensnr++) {
     if (cntr == 3) {
-      cntr++;
+      sensnr = 4;
     } // as sensors 2 and 3 are actually one sensor, only one thread is needed.
     res = start_watch_thread(
         (threads + cntr), cntr,
@@ -289,6 +284,10 @@ int buffer_empty(char *sensnr) {
 void close_watch(void) {
   char cntr = 0;
   for (; cntr < 5; cntr++) {
+    if (cntr < 4) {
+      // stop watch threads
+      stop_watch_thread(threads + cntr);
+    }
 
     // free actual buffers
     free((bufarr + cntr)->s_ptr);
@@ -296,11 +295,6 @@ void close_watch(void) {
     // cleanup the mutexes
     pthread_mutex_destroy(&((bufarr + cntr)->r_mutex));
     pthread_mutex_destroy(&((bufarr + cntr)->w_mutex));
-    if (cntr < 4) {
-
-      // stop watch threads
-      stop_watch_thread(threads + cntr);
-    }
   }
 
   stop_other_thread(thread_db);

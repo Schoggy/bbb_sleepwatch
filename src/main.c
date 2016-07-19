@@ -210,6 +210,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+  printf("freeing qthread\n");
   free(thread);
   pthread_mutex_destroy(&mutex);
   cleanup();
@@ -273,8 +274,10 @@ void cleanup(void) {
   free(output);
   free(logfile);
   free(dbfile);
-  
+  printf("stopping out\n");  
   close_out();
+  printf("stopping watch\n");
   close_watch();
+  printf("stopping db\n");
   close_db();
 }

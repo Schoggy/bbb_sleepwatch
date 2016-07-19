@@ -21,16 +21,12 @@ static void *data_out_thread(void *arg) {
       // active.
       // therefore wake the thread 10 times during idle time to check if it
       // should stop.
-      sleep_milliseconds(inf->delay / 10);
+      sleep_milliseconds(inf->delay / 30);
       // lock mutex protecting the variable "running"
       pthread_mutex_lock(&mutex);
       if (!inf->running) { // stop the thread
         pthread_mutex_unlock(&mutex);
         pthread_mutex_destroy(&mutex);
-        // OK to call logm here, status of all threads is known, noone will call
-        // log functions right now
-        logm("INFO data output thread successfully stopped.");
-
         pthread_exit(NULL);
       }
       pthread_mutex_unlock(&mutex);
@@ -93,7 +89,7 @@ void write_data(FILE *file, TABLE **data) {
   char cnt_sens;
   for (; cnt < data[0]->linecount; cnt++) {
     memset(out_buf, '\0', 100);
-    strncpy(out_buf, data[0]->lines[0].mtimestamp, 20);
+    strncpy(out_buf, data[0]->lines[cnt].mtimestamp, 20);
     for (cnt_sens = 0; cnt_sens < 5; cnt_sens++) {
       memset(num_buf, '\0', 12);
       if(data[cnt_sens] != NULL){
