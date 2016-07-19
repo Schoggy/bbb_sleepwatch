@@ -47,10 +47,11 @@ X = done, F = relatively tested - kind of stable code, B = testing/debugging, ->
  - X  read from AM2302
  - X  database design
  - F  interface for the database
- - B  reading & buffering data from the sensors
+ - F  reading & buffering data from the sensors
  - B  "scheduler" and threads
- - -> module to analyze the data
- - -  create style for the website
+ - B  module to analyze the data
+ - B  main function
+ - -> create style for the website
  - -  web interface
  - -  lots of testing & debugging
  - +  alarm module
