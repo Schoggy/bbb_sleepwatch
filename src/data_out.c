@@ -69,7 +69,7 @@ int refresh_out_time(void) {
     destroy_table(data[cnt]);
   }
   free(data);
-  
+
   return 0;
 }
 
@@ -97,22 +97,22 @@ TABLE *get_data_time(char sensnr) {
 }
 
 void write_data(TABLE **data) {
-  
+
   // open 5 files, one for each sensor
-  FILE **files = (FILE**) malloc(5 * sizeof(FILE*));
-  char *filename = (char*) malloc(strlen(out_file) + 6 * sizeof(char));
+  FILE **files = (FILE **)malloc(5 * sizeof(FILE *));
+  char *filename = (char *)malloc(strlen(out_file) + 6 * sizeof(char));
   char ccnt = 0;
-  for(; ccnt < 5; ccnt++){
+  for (; ccnt < 5; ccnt++) {
     memset(filename, '\0', strlen(out_file) + 6);
     strncpy(filename, out_file, strlen(out_file));
     strncat(filename, get_tablename(ccnt), 6);
     *(files + ccnt) = fopen(filename, "w+");
-    if(*(files + ccnt) == NULL){
+    if (*(files + ccnt) == NULL) {
       logc("ERROR opening output file failed! : ", filename);
     }
   }
   free(filename);
-  
+
   // reserve memory for buffer strings
   char *out_buf = (char *)malloc(48 * sizeof(char));
   char *num_buf = (char *)malloc(12 * sizeof(char));
@@ -121,32 +121,32 @@ void write_data(TABLE **data) {
 
   // for every sensor
   for (cnt_sens = 0; cnt_sens < 5; cnt_sens++) {
-  
-    for(ccnt = 0; ccnt < data[cnt_sens]->linecount; ccnt++){
-    
+
+    for (ccnt = 0; ccnt < data[cnt_sens]->linecount; ccnt++) {
+
       // reset buffers
       memset(out_buf, '\0', 48);
       memset(num_buf, '\0', 12);
-      
+
       // grab timestamp
       strncpy(out_buf, data[cnt_sens]->lines[cnt].mtimestamp, 20);
-      
+
       // convert value to string
       snprintf(num_buf, 11, ";%i", data[cnt_sens]->lines[ccnt].value);
-          
+
       // add datapoint to this lines buffer
       strncat(out_buf, num_buf, strlen(num_buf));
-      
+
       // write line this line to the file
       fwrite(out_buf, sizeof(char), strlen(out_buf), *(files + cnt_sens));
-      if(ccnt < data[cnt_sens]->linecount - 1){
+      if (ccnt < data[cnt_sens]->linecount - 1) {
         fwrite(",\n", sizeof(char), 2, *(files + cnt_sens));
       }
     }
   }
-  
+
   // cleanup
-  for(ccnt = 0; ccnt < 5; ccnt++){
+  for (ccnt = 0; ccnt < 5; ccnt++) {
     fclose(*(files + ccnt));
   }
   free(out_buf);

@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
 
   char read_only = 0;
   char new_dbfile = 0;
+  char autostarted = 0;
 
   unsigned long timeout = 0;
   unsigned long output_mins = 0;
@@ -44,6 +45,9 @@ int main(int argc, char *argv[]) {
   for (cntr = 1; cntr < argc; cntr++) {
     if (argv[cntr][0] == '-') {
       switch (argv[cntr][1]) {
+      case 'a': {
+        autostarted = 1;
+      }
       case 'd': {
         if (argv[cntr][2] == '=') {
           dbfile = (char *)calloc(strlen(&argv[cntr][3]), sizeof(char));
@@ -178,7 +182,7 @@ int main(int argc, char *argv[]) {
     out_delay = DEFAULT_OUT_DELAY;
   }
   out_delay *= 1000;
-  
+
   // convert timeout from minutes to unit of 100 milliseconds if set
   if (timeout) {
     timeout *= 600;
@@ -199,19 +203,23 @@ int main(int argc, char *argv[]) {
   printf("Running... ");
   if (!read_only) {
     char running = 1;
-
-    // start thread to check for user input
+    
     OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     thread->spinlock = &mutex;
-    start_other_thread(thread, 0, &check_q);
-
+    
+    if (!autostarted) {
+      // start thread to check for user input
+      start_other_thread(thread, 0, &check_q);
+    }
     // main loop
     printf("Press 'Q'-Enter to stop!\n");
     while (running) {
-      pthread_mutex_lock(thread->spinlock);
-      running = thread->running;
-      pthread_mutex_unlock(thread->spinlock);
+      if(!autostarted){
+        pthread_mutex_lock(thread->spinlock);
+        running = thread->running;
+        pthread_mutex_unlock(thread->spinlock);
+      }
       sleep_milliseconds(100);
 
       if (timeout > 0) {
@@ -219,13 +227,17 @@ int main(int argc, char *argv[]) {
         if (timeout == 0) {
           printf("Timeout! Stopping...\n");
           logm("Timeout hit! Stopping...\n");
-          pthread_cancel(thread->t_id);
+          if (!autostarted) {
+            pthread_cancel(thread->t_id);
+          }
           running = 0;
         }
       }
     }
+    
     free(thread);
     pthread_mutex_destroy(&mutex);
+    
   } else {
     printf("\n");
     refresh_out_time();
@@ -270,6 +282,8 @@ int test_path(char *fpath) {
 void print_usage(void) {
   printf("Usage: sleepwatch [OPTIONS]\n\n"
          "Options:\n"
+         "  -a          Autostarted mode: Will not start a thread to check for "
+         "user input.\n"
          "  -d=foo/bar  Path to and name of database file. Default is current "
          "directory.\n"
          "  -f=foo/bar  Path to and name of output file. Default is current "
