@@ -4,8 +4,8 @@ additional_sources = $(src_folder)dht/*.c $(src_folder)dht/BBB/*.c
 cfn = sleepwatch
 
 compiler = gcc
-compiler_args = -std=gnu99 -ggdb -pthread -I $(src_folder) $(additionsal_sources)
-compiler_args_final = -std=gnu99 -pthread -I $(src_folder) $(additionsal_sources)
+compiler_args = -std=gnu99 -ggdb -pthread -I $(src_folder)
+compiler_args_final = -std=gnu99 -pthread -I $(src_folder)
 linker_args = -lsqlite3 -pthread -lm
 
 formatter = clang-format
@@ -45,10 +45,10 @@ info:
 	@echo
 
 _dot_o:
-	$(compiler) $(compiler_args) $(src_folder)*.c -c 
+	$(compiler) $(compiler_args) $(additional_sources) $(src_folder)*.c -c 
 
 _dot_o_final:
-	$(compiler) $(compiler_args_final) $(src_folder)*.c -c 
+	$(compiler) $(compiler_args_final) $(additional_sources) $(src_folder)*.c -c 
 
 compile: _dot_o
 	$(compiler) $(compiler_args) *.o -o $(cfn) $(linker_args)
