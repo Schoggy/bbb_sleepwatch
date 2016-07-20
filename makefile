@@ -19,12 +19,12 @@ test_all: format compile cppcheck run memcheck flawfinder clean
 
 install: compile
 	mkdir /opt/sleepwatch
-	cp sleepwatch /opt/sleepwatch
+	cp -f sleepwatch /opt/sleepwatch
 
 install_autostart: compile install
-	cp resources/sleepwatch.local /usr/local/sbin/
+	cp -f resources/sleepwatch.local /usr/local/sbin/
 	chmod u+x /usr/local/sbin/sleepwatch.local
-	cp resources/sleepwatch.service /etc/systemd/system
+	cp -f resources/sleepwatch.service /etc/systemd/system
 	
 help:
 	@echo
