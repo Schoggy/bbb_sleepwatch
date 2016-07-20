@@ -32,7 +32,7 @@ static void *db_thread(void *arg) {
     for (dcnt = 0; dcnt < 10; dcnt++) {
       // this thread should have a high idle time but can only be stopped when
       // active.
-      // therefore wake the thread every seconf during idle time to check if it
+      // therefore wake the thread 10 times during idle time to check if it
       // should stop.
       sleep_milliseconds(inf->delay / 10);
       // lock mutex protecting the variable "running"
@@ -103,7 +103,7 @@ void run_threads(void) {
     if (cntr == 3) {
       sensnr = 4;
     } // as sensors 2 and 3 are actually one sensor, only one thread is needed.
-      // Move to sensor 4 for thread 3
+    // Move to sensor 4 for thread 3
     res = start_watch_thread(
         (threads + cntr), cntr,
         (unsigned int)floor(DB_LOG_INTERVAL /

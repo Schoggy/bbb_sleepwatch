@@ -1,6 +1,6 @@
 src_folder = src/
 
-cfn = sleepwatch_test.a
+cfn = sleepwatch
 
 compiler = gcc
 compiler_args = -std=gnu99 -ggdb -pthread -I $(src_folder)
@@ -15,12 +15,16 @@ std2: format run
 
 std1: format compile
 
+install:
+	sudo apt-get -y install sqlite3
+
 test_all: format compile cppcheck run memcheck flawfinder clean
 
 help:
 	@echo
 	@echo Targets are: help, compile, clean, run, cppcheck,
-	@echo memcheck, flawfinder, time, test_all, format, clean_all
+	@echo memcheck, flawfinder, test_all, format, clean_all
+	@echo and install (installs sqlite3, the only prerequisite for sleepwatch)
 	@echo
 
 info: 
@@ -50,9 +54,6 @@ memcheck: compile
 
 flawfinder:
 	flawfinder $(src_folder)*.c
-
-time: compile
-	time ./$(cfn)
 
 format: 
 	$(formatter) $(formatter_args) $(src_folder)*.c

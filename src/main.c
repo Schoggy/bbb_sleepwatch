@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
   init_watch(!read_only);
   init_out(output, out_delay, &from, &to, read_only);
   printf("Running... ");
-  if(!read_only){
+  if (!read_only) {
     char running = 1;
 
     // start thread to check for user input
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     thread->spinlock = &mutex;
     start_other_thread(thread, 0, &check_q);
-    
+
     // main loop
     printf("Press 'Q'-Enter to stop!\n");
     while (running) {

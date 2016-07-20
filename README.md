@@ -50,7 +50,7 @@ X = done, F = relatively tested - kind of stable code, B = testing/debugging, ->
  - F  reading & buffering data from the sensors
  - F  "scheduler" and threads
  - F  module to analyze the data
- - B  main function
+ - F  main function
  - -> create style for the website
  - -  web interface
  - -> lots of testing & debugging

@@ -5,7 +5,7 @@ void init_out(char *file, unsigned int out_delay, unsigned int *i_from,
   out_file = file;
   from = *i_from;
   to = *i_to;
-  if(!read_only){
+  if (!read_only) {
     thread_do = (OTHR *)malloc(sizeof(OTHR));
     start_other_thread(thread_do, out_delay, &data_out_thread);
   }
@@ -21,7 +21,7 @@ static void *data_out_thread(void *arg) {
     for (dcnt = 0; dcnt < 30; dcnt++) {
       // this thread should have a high idle time but can only be stopped when
       // active.
-      // therefore wake the thread every second during idle time to check if it
+      // therefore wake the thread 30 times during idle time to check if it
       // should stop.
       sleep_milliseconds(inf->delay / 30);
       // lock mutex protecting the variable "running"
@@ -108,8 +108,10 @@ void write_data(FILE *file, TABLE **data) {
   char cnt_sens;
 
   // write header
-  fwrite("Timestamp, Light level, Noise level, Temperature, Humidity, Air Quality\n", 72, sizeof(char), file);
-  
+  fwrite("Timestamp, Light level, Noise level, Temperature, Humidity, Air "
+         "Quality\n",
+         72, sizeof(char), file);
+
   // for every line retrieved
   for (; cnt < data[0]->linecount; cnt++) {
 
@@ -128,7 +130,7 @@ void write_data(FILE *file, TABLE **data) {
         if (data[cnt_sens]->lines != NULL) {
 
           // convert the datapoint to a string
-          if(data[cnt_sens]->linecount >= cnt){
+          if (data[cnt_sens]->linecount >= cnt) {
             snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
           } else {
             strncpy(num_buf, ",-", 2);
