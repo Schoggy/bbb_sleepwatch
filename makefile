@@ -1,9 +1,11 @@
 src_folder = src/
+additional_sources = $(src_folder)dht/*.c $(src_folder)dht/BBB/*.c
 
 cfn = sleepwatch
 
 compiler = gcc
-compiler_args = -std=gnu99 -ggdb -pthread -I $(src_folder)
+compiler_args = -std=gnu99 -ggdb -pthread -I $(src_folder) $(additionsal_sources)
+compiler_args_final = -std=gnu99 -pthread -I $(src_folder) $(additionsal_sources)
 linker_args = -lsqlite3 -pthread -lm
 
 formatter = clang-format
@@ -17,12 +19,12 @@ std1: format compile
 
 test_all: format compile cppcheck run memcheck flawfinder clean
 
-install: compile
+install: compile_final
 	rm -rf /opt/sleepwatch
 	mkdir /opt/sleepwatch
 	cp -f sleepwatch /opt/sleepwatch
 
-install_autostart: compile install
+install_autostart: install
 	cp -f resources/sleepwatch.local /usr/local/sbin/
 	chmod u+x /usr/local/sbin/sleepwatch.local
 	cp -f resources/sleepwatch.service /etc/systemd/system
@@ -42,13 +44,17 @@ info:
 	@echo install_autostart will only work with systemd
 	@echo
 
-compile: _dot_o _compile_final
-
 _dot_o:
-	$(compiler) $(compiler_args) src/dht/*.c src/dht/BBB/*.c $(src_folder)*.c -c 
+	$(compiler) $(compiler_args) $(src_folder)*.c -c 
 
-_compile_final:
+_dot_o_final:
+	$(compiler) $(compiler_args_final) $(src_folder)*.c -c 
+
+compile: _dot_o
 	$(compiler) $(compiler_args) *.o -o $(cfn) $(linker_args)
+
+compile_final: _dot_o_final
+	$(compiler) $(compiler_args_final) *.o -o $(cfn) $(linker_args)
 
 debug: compile
 	gdb -directory=src/ -tui -se=./$(cnf)
