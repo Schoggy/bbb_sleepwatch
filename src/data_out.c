@@ -105,7 +105,7 @@ void write_data(TABLE **data) {
   for (; ccnt < 5; ccnt++) {
     memset(filename, '\0', strlen(out_file) + 6);
     strncpy(filename, out_file, strlen(out_file));
-    strncat(filename, get_tablename(ccnt), 6);
+    strncat(filename, get_tablename(ccnt), 5);
     *(files + ccnt) = fopen(filename, "w+");
     if (*(files + ccnt) == NULL) {
       logc("ERROR opening output file failed! : ", filename);

@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
       } break;
       case 'd': {
         if (argv[cntr][2] == '=') {
-          dbfile = (char *)calloc(strlen(&argv[cntr][3]), sizeof(char));
+          dbfile = (char *)calloc(strlen(&argv[cntr][3]) + 1, sizeof(char));
           strncpy(dbfile, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
       } break;
       case 'f': {
         if (argv[cntr][2] == '=') {
-          output = (char *)calloc(strlen(&argv[cntr][3]), sizeof(char));
+          output = (char *)calloc(strlen(&argv[cntr][3]) + 1, sizeof(char));
           strncpy(output, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
       } break;
       case 'l': {
         if (argv[cntr][2] == '=') {
-          logfile = (char *)calloc(strlen(&argv[cntr][3]), sizeof(char));
+          logfile = (char *)calloc(strlen(&argv[cntr][3]) + 1, sizeof(char));
           strncpy(logfile, &argv[cntr][3], strlen(&argv[cntr][3]));
         } else {
           printf("Unknown argument: %s !\n", argv[cntr]);
