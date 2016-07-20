@@ -119,12 +119,13 @@ void write_data(TABLE **data) {
 
   // open 5 files, one for each sensor
   FILE **files = (FILE **)malloc(5 * sizeof(FILE *));
-  char *filename = (char *)malloc(strlen(out_file) + 6 * sizeof(char));
+  char *filename = (char *)malloc(strlen(out_file) + 10 * sizeof(char));
   char ccnt = 0;
   for (; ccnt < 5; ccnt++) {
     memset(filename, '\0', strlen(out_file) + 6);
     strncpy(filename, out_file, strlen(out_file));
     strncat(filename, get_tablename(ccnt), 5);
+    strncat(filename, ".txt", 4);
     *(files + ccnt) = fopen(filename, "w+");
     if (*(files + ccnt) == NULL) {
       logc("ERROR opening output file failed! : ", filename);
