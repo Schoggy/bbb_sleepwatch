@@ -15,21 +15,18 @@ std2: format run
 
 std1: format compile
 
-install:
-	sudo apt-get -y install sqlite3
-
 test_all: format compile cppcheck run memcheck flawfinder clean
 
 help:
 	@echo
 	@echo Targets are: help, compile, clean, run, cppcheck,
 	@echo memcheck, flawfinder, test_all, format, clean_all
-	@echo and install (installs sqlite3, the only prerequisite for sleepwatch)
 	@echo
 
 info: 
 	@echo
 	@echo This makefile assumes that all source files are located in $(src_folder)
+	@echo This Program requires sqlite3
 	@echo
 
 compile: _dot_o _compile_final
