@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
       switch (argv[cntr][1]) {
       case 'a': {
         autostarted = 1;
-      }
+      } break;
       case 'd': {
         if (argv[cntr][2] == '=') {
           dbfile = (char *)calloc(strlen(&argv[cntr][3]), sizeof(char));
