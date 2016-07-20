@@ -215,6 +215,7 @@ int main(int argc, char *argv[]) {
         timeout--;
         if (timeout == 0) {
           printf("Timeout! Stopping...\n");
+          logm("Timeout hit! Stopping...\n");
           pthread_cancel(thread->t_id);
           running = 0;
         }
@@ -277,7 +278,7 @@ void print_usage(void) {
          "  -p=x        Output data from x minutes in the past.\n"
          "  -r          Only read from database, no monitoring.\n"
          "  -t=x        Run for x minutes. Default is infinite.\n"
-         "  -w=x        Wait x seconds between refreshing hte output file. "
+         "  -w=x        Wait x seconds between refreshing the output file. "
          "Default is 30 seconds.\n"
          "\n");
 }
@@ -287,6 +288,7 @@ void cleanup(void) {
   close_watch();
   close_db();
   printf("Done! Wrote data to %s.\n", output);
+  logm("INFO successfully shut down!");
   free(output);
   free(logfile);
   free(dbfile);

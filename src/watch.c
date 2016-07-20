@@ -29,12 +29,12 @@ static void *db_thread(void *arg) {
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   inf->spinlock = &mutex;
   while (1) {
-    for (dcnt = 0; dcnt < 10; dcnt++) {
+    for (dcnt = 0; dcnt < inf->delay / 1000; dcnt++) {
       // this thread should have a high idle time but can only be stopped when
       // active.
-      // therefore wake the thread 10 times during idle time to check if it
+      // therefore wake the thread every seconf during idle time to check if it
       // should stop.
-      sleep_milliseconds(inf->delay / 10);
+      sleep_milliseconds(1000);
       // lock mutex protecting the variable "running"
       pthread_mutex_lock(&mutex);
       if (!inf->running) { // stop the thread

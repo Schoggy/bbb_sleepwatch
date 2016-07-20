@@ -43,13 +43,15 @@ int init_db(char *file, char newdb) {
             sql_res);
       sqlite3_finalize(crt_stmt);
       close_db();
+      free(str_stmt);
       return 1;
     }
     memset(str_stmt, '\0', 28);
     mnr_cnts[sensnr] = sqlite3_column_int64(crt_stmt, 0);
+    sqlite3_finalize(crt_stmt);
   }
   free(str_stmt);
-  return sql_res;
+  return 0;
 }
 
 void close_db(void) { sqlite3_close(db); }
