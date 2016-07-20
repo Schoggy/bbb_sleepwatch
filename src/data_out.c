@@ -46,9 +46,6 @@ void set_timeframe(unsigned int *i_from, unsigned int *i_to) {
 }
 
 int refresh_out_time(void) {
-
-  // overwrite and open the output file
-  FILE *file = fopen(out_file, "w+");
   char cnt = 0;
 
   // reserve memory for the TABLE structs
@@ -59,22 +56,20 @@ int refresh_out_time(void) {
     data[cnt] = get_data_time(cnt);
     if (data[cnt] == NULL) { // if no data retrieved
       logn("ERROR could not retrieve table for sensnr: ", (int)cnt);
-      fclose(file);
       free(data);
       return cnt;
     }
   }
 
   // write data to the file
-  write_data(file, data);
+  write_data(data);
 
-  // free the TABLE structs
+  // cleanup
   for (cnt = 0; cnt < 5; cnt++) {
     destroy_table(data[cnt]);
   }
-  // more cleanup
   free(data);
-  fclose(file);
+  
   return 0;
 }
 
@@ -101,60 +96,59 @@ TABLE *get_data_time(char sensnr) {
   return out;
 }
 
-void write_data(FILE *file, TABLE **data) {
-  char *out_buf = (char *)malloc(100 * sizeof(char));
+void write_data(TABLE **data) {
+  
+  // open 5 files, one for each sensor
+  FILE **files = (FILE**) malloc(5 * sizeof(FILE*));
+  char *filename = (char*) malloc(strlen(out_file) + 6 * sizeof(char));
+  char ccnt = 0;
+  for(; ccnt < 5; ccnt++){
+    memset(filename, '\0', strlen(out_file) + 6);
+    strncpy(filename, out_file, strlen(out_file));
+    strncat(filename, get_tablename(ccnt), 6);
+    *(files + ccnt) = fopen(filename, "w+");
+    if(*(files + ccnt) == NULL){
+      logc("ERROR opening output file failed! : ", filename);
+    }
+  }
+  free(filename);
+  
+  // reserve memory for buffer strings
+  char *out_buf = (char *)malloc(48 * sizeof(char));
   char *num_buf = (char *)malloc(12 * sizeof(char));
   long cnt = 0;
   char cnt_sens;
 
-  // write header
-  fwrite("Timestamp, Light level, Noise level, Temperature, Humidity, Air "
-         "Quality\n",
-         72, sizeof(char), file);
-
-  // for every line retrieved
-  for (; cnt < data[0]->linecount; cnt++) {
-
-    // reset buffer
-    memset(out_buf, '\0', 100);
-
-    // grab timestamp
-    strncpy(out_buf, data[0]->lines[cnt].mtimestamp, 20);
-
-    // for every sensor
-    for (cnt_sens = 0; cnt_sens < 5; cnt_sens++) {
-
-      // reset buffer
+  // for every sensor
+  for (cnt_sens = 0; cnt_sens < 5; cnt_sens++) {
+  
+    for(ccnt = 0; ccnt < data[cnt_sens]->linecount; ccnt++){
+    
+      // reset buffers
+      memset(out_buf, '\0', 48);
       memset(num_buf, '\0', 12);
-      if (data[cnt_sens] != NULL) { // if data available
-        if (data[cnt_sens]->lines != NULL) {
-
-          // convert the datapoint to a string
-          if (data[cnt_sens]->linecount >= cnt) {
-            snprintf(num_buf, 11, ",%i", data[cnt_sens]->lines[cnt].value);
-          } else {
-            strncpy(num_buf, ",-", 2);
-          }
-        } else {
-
-          // add a '-' if no value present
-          strncpy(num_buf, ",-", 2);
-        }
-      } else {
-        strncpy(num_buf, ",-", 2);
-      }
+      
+      // grab timestamp
+      strncpy(out_buf, data[cnt_sens]->lines[cnt].mtimestamp, 20);
+      
+      // convert value to string
+      snprintf(num_buf, 11, ";%i,\n", data[cnt_sens]->lines[ccnt].value);
+          
       // add datapoint to this lines buffer
       strncat(out_buf, num_buf, strlen(num_buf));
+      
+      // write line this line to the file
+      fwrite(out_buf, sizeof(char), strlen(out_buf), *(files + cnt_sens));
     }
-
-    // write line this line to the file
-    fwrite(out_buf, sizeof(char), strlen(out_buf), file);
-
-    // start a new line
-    fwrite("\n", sizeof(char), 1, file);
+  }
+  
+  // cleanup
+  for(ccnt = 0; ccnt < 5; ccnt++){
+    fclose(*(files + ccnt));
   }
   free(out_buf);
   free(num_buf);
+  free(files);
 }
 
 void close_out(void) {

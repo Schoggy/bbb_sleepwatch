@@ -29,7 +29,7 @@ int refresh_out_time(void);
 TABLE *get_data_time(char sensnr);
 
 // writes data given in "data" to the file
-void write_data(FILE *file, TABLE **data);
+void write_data(TABLE **data);
 
 // stop the output thread
 void close_out(void);

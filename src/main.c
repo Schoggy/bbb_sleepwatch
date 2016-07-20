@@ -17,7 +17,7 @@
 #define DEFAULT_OUT_DELAY 30
 
 // default file names
-#define DEFAULT_OUTPUT "output"
+#define DEFAULT_OUTPUT "output_"
 #define DEFAULT_LOG "sleepwatch_log"
 #define DEFAULT_DB "sleepwatch_db"
 
