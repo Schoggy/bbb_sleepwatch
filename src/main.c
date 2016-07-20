@@ -137,6 +137,8 @@ int main(int argc, char *argv[]) {
         "ERROR! Path for output file not valid or insufficient permissions!");
     cleanup();
     return 1;
+  } else {
+    remove(output);
   }
 
   // database file

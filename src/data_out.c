@@ -132,13 +132,16 @@ void write_data(TABLE **data) {
       strncpy(out_buf, data[cnt_sens]->lines[cnt].mtimestamp, 20);
       
       // convert value to string
-      snprintf(num_buf, 11, ";%i,\n", data[cnt_sens]->lines[ccnt].value);
+      snprintf(num_buf, 11, ";%i", data[cnt_sens]->lines[ccnt].value);
           
       // add datapoint to this lines buffer
       strncat(out_buf, num_buf, strlen(num_buf));
       
       // write line this line to the file
       fwrite(out_buf, sizeof(char), strlen(out_buf), *(files + cnt_sens));
+      if(ccnt < data[cnt_sens]->linecount - 1){
+        fwrite(",\n", sizeof(char), 2, *(files + cnt_sens));
+      }
     }
   }
   
