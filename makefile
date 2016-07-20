@@ -18,6 +18,7 @@ std1: format compile
 test_all: format compile cppcheck run memcheck flawfinder clean
 
 install: compile
+	rm -rf /opt/sleepwatch
 	mkdir /opt/sleepwatch
 	cp -f sleepwatch /opt/sleepwatch
 
