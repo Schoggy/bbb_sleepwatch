@@ -2,5 +2,5 @@
 #
 # /usr/local/sbin/sleepwatch.local: Local multi-user startup script.
 
-/opt/sleepwatch/sleepwatch -o=480 -f=/opt/sleepwatch/out -l=/var/log/sleepwatch.log -d=/opt/sleepwatch/sqlite_db > /dev/null &
+/opt/sleepwatch/sleepwatch -o=480 -f=/opt/sleepwatch/out_ -l=/var/log/sleepwatch.log -d=/opt/sleepwatch/sqlite_db > /dev/null &
 

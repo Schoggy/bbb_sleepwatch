@@ -290,7 +290,7 @@ void cleanup(void) {
   close_out();
   close_watch();
   close_db();
-  printf("Done! Wrote data to %s.\n", output);
+  printf("Manually stopped. Wrote data to %s<x>vals!\n", output);
   logm("INFO successfully shut down!");
   free(output);
   free(logfile);
