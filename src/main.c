@@ -177,7 +177,8 @@ int main(int argc, char *argv[]) {
   if (out_delay == 0) {
     out_delay = DEFAULT_OUT_DELAY;
   }
-
+  out_delay *= 1000;
+  
   // convert timeout from minutes to unit of 100 milliseconds if set
   if (timeout) {
     timeout *= 600;
