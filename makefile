@@ -26,6 +26,7 @@ install_autostart: compile install
 	cp -f resources/sleepwatch.local /usr/local/sbin/
 	chmod u+x /usr/local/sbin/sleepwatch.local
 	cp -f resources/sleepwatch.service /etc/systemd/system
+	systemctl enable sleepwatch.service
 	
 help:
 	@echo
