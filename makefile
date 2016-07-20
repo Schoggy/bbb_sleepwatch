@@ -17,16 +17,27 @@ std1: format compile
 
 test_all: format compile cppcheck run memcheck flawfinder clean
 
+install: compile
+	mkdir /opt/sleepwatch
+	cp sleepwatch /opt/sleepwatch
+
+install_autostart: compile install
+	cp resources/sleepwatch.local /usr/local/sbin/
+	chmod u+x /usr/local/sbin/sleepwatch.local
+	cp resources/sleepwatch.service /etc/systemd/system
+	
 help:
 	@echo
 	@echo Targets are: help, compile, clean, run, cppcheck,
 	@echo memcheck, flawfinder, test_all, format, clean_all
+	@echo install, install_autostart
 	@echo
 
 info: 
 	@echo
 	@echo This makefile assumes that all source files are located in $(src_folder)
 	@echo This Program requires sqlite3
+	@echo install_autostart will only work with systemd
 	@echo
 
 compile: _dot_o _compile_final
