@@ -1,3 +1,22 @@
+/*
+Sleepwatch, a programm to gather data from sensors and output it in a ordered
+fashion
+Copyright (C) 2016, Philip Manke
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 #include "data_out.h"
 #include "dht/common_dht_read.h"
 #include "log.h"
@@ -42,6 +61,11 @@ int main(int argc, char *argv[]) {
   unsigned long out_delay = 0;
 
   char cntr;
+  printf("Sleepwatch version 0.1, Copyright (C) 2016 Philip Manke\n"
+         "Gnomovision comes with ABSOLUTELY NO WARRANTY; for details\n"
+         "type 'sleepwatch -g'.  This is free software, and you are welcome\n"
+         "to redistribute it under certain conditions;\n"
+         "read the file 'COPYING' for details.\n\n");
   for (cntr = 1; cntr < argc; cntr++) {
     if (argv[cntr][0] == '-') {
       switch (argv[cntr][1]) {
@@ -65,6 +89,30 @@ int main(int argc, char *argv[]) {
           printf("Unknown argument: %s !\n", argv[cntr]);
           return 1;
         }
+      } break;
+      case 'g': {
+        printf("NO WARRANTY\n\n"
+               "11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS "
+               "NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY "
+               "APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE "
+               "COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "
+               "\"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR "
+               "IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES "
+               "OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE "
+               "ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM "
+               "IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME "
+               "THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n"
+               "12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO "
+               "IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO "
+               "MAY MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, "
+               "BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, "
+               "INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR "
+               "INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO "
+               "LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES "
+               "SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM "
+               "TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR "
+               "OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH "
+               "DAMAGES.\n");
       } break;
       case 'n': {
         new_dbfile = 1;
@@ -203,11 +251,11 @@ int main(int argc, char *argv[]) {
   printf("Running... ");
   if (!read_only) {
     char running = 1;
-    
+
     OTHR *thread = (OTHR *)malloc(sizeof(OTHR));
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     thread->spinlock = &mutex;
-    
+
     if (!autostarted) {
       // start thread to check for user input
       start_other_thread(thread, 0, &check_q);
@@ -215,7 +263,7 @@ int main(int argc, char *argv[]) {
     // main loop
     printf("Press 'Q'-Enter to stop!\n");
     while (running) {
-      if(!autostarted){
+      if (!autostarted) {
         pthread_mutex_lock(thread->spinlock);
         running = thread->running;
         pthread_mutex_unlock(thread->spinlock);
@@ -234,10 +282,10 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    
+
     free(thread);
     pthread_mutex_destroy(&mutex);
-    
+
   } else {
     printf("\n");
     refresh_out_time();
